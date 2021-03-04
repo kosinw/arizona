@@ -1,5 +1,5 @@
 use crate::{
-    common::source::Source,
+    common::{source::Source, span::Span, span::Spanned},
     compiler::{
         syntax_error::{SyntaxError, SyntaxErrors},
         token::Token,
@@ -15,21 +15,19 @@ pub struct Lexer {
     errors: SyntaxErrors,
 }
 
-type TokenSpan = (Token, usize);
+pub type Tokens = Vec<Spanned<Token>>;
 
 lazy_static! {
-    static ref KEYWORDS: HashMap<String, Token> = {
-        let mut m = HashMap::new();
-        m.insert(String::from("let"), Token::Let);
-        m.insert(String::from("fn"), Token::Fn);
-        m.insert(String::from("return"), Token::Return);
-        m.insert(String::from("if"), Token::If);
-        m.insert(String::from("else"), Token::Else);
-        m
+    static ref KEYWORDS: HashMap<String, Token> = hashmap! {
+        String::from("let")    => Token::Let,
+        String::from("fn")     => Token::Fn,
+        String::from("return") => Token::Return,
+        String::from("if")     => Token::If,
+        String::from("else")   => Token::Else
     };
 }
 
-pub fn lex(source: &Rc<Source>) -> Result<Vec<Token>, SyntaxErrors> {
+pub fn lex(source: &Rc<Source>) -> (Tokens, SyntaxErrors) {
     let mut lexer = Lexer::new(source);
     lexer.all()
 }
@@ -43,16 +41,15 @@ impl Lexer {
         }
     }
 
-    pub fn all(&mut self) -> Result<Vec<Token>, SyntaxErrors> {
-        // TODO: add spanned type later
-        let mut tokens: Vec<_> = self.into_iter().map(|x| x.0).collect();
-        tokens.push(Token::End);
+    pub fn all(&mut self) -> (Tokens, SyntaxErrors) {
+        let mut tokens: Vec<_> = self.into_iter().collect();
 
-        if self.errors.len() > 0 {
-            return Err(self.errors.clone());
-        }
+        tokens.push(Spanned::new(
+            Token::End,
+            Span::new(&self.source, self.cursor, 0),
+        ));
 
-        Ok(tokens)
+        (tokens, self.errors.clone())
     }
 
     fn remaining(&self) -> &str {
@@ -100,7 +97,7 @@ impl Lexer {
 
     // TODO: Implement multiline comments
     fn strip_multiline_comment(&mut self) {
-        unimplemented!()
+        todo!()
     }
 
     fn strip_comments(&mut self) {
@@ -157,6 +154,7 @@ impl Lexer {
     fn read_string_literal(&mut self) -> Option<String> {
         let mut buf = String::new();
 
+        let then = self.cursor;
         self.consume();
 
         loop {
@@ -164,13 +162,19 @@ impl Lexer {
                 Some('"') => break,
                 Some('\\') => self.read_escaped_char(),
                 Some(ch) => Some(ch),
-                _ => None,
+                _ => None, // EOF
             };
 
             if let Some(ch) = ch {
                 buf.push(ch);
             } else {
                 // TODO: Raise syntax error here
+                self.errors.push(SyntaxError::new(
+                    "unexpected EOF while scanning string literal",
+                    &Span::new(&self.source, then, self.cursor - then + 1)
+                ));
+
+                break;
             }
 
             self.consume();
@@ -179,6 +183,7 @@ impl Lexer {
         if self.current() == Some('"') {
             Some(buf)
         } else {
+            // Hit a syntax error
             None
         }
     }
@@ -187,17 +192,18 @@ impl Lexer {
         self.consume();
 
         match self.current() {
-            Some('\'') | Some('\"') | Some('\\') => self.current(),
             Some('t') => Some('\t'),
             Some('n') => Some('\n'),
             Some('f') => Some('\x0C'),
             Some('r') => Some('\r'),
             Some('v') => Some('\x0B'),
-            _ => None, // TODO(kosi): Add unknown escape character syntax error here
+            Some(ch) => Some(ch),
+            _ => None,
         }
     }
 
     fn read_char_literal(&mut self) -> Option<char> {
+        let then = self.cursor;
         self.consume();
 
         let value = if self.current() == Some('\\') {
@@ -211,7 +217,24 @@ impl Lexer {
         if self.current() == Some('\'') {
             value
         } else {
-            // TODO: Generate syntax error here
+            if value == Some('\'') {
+                self.errors.push(SyntaxError::new(
+                    "cannot have empty char literal",
+                    &Span::new(&self.source, then, self.cursor - then)
+                ));
+                return None;
+            }
+
+            let got = match self.current() {
+                Some(ch) => format!("`{}`", ch),
+                None => String::from("EOF")
+            };
+
+            self.errors.push(SyntaxError::new(
+                &format!("expected `'` at end of char literal, instead got {}", got),
+                &Span::new(&self.source, then, self.cursor - then + 1)
+            ));
+
             None
         }
     }
@@ -254,7 +277,7 @@ impl Lexer {
 }
 
 impl Iterator for Lexer {
-    type Item = TokenSpan;
+    type Item = Spanned<Token>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.strip_whitespace();
@@ -350,7 +373,24 @@ impl Iterator for Lexer {
 
                     Token::IntegerLiteral(literal)
                 } else {
-                    // TODO: Add illegal character syntax error
+                    let mut buf = String::new();
+
+                    loop {
+                        let ch = match self.current() {
+                            Some(ch) => if ch.is_whitespace() { break } else { ch }
+                            None => break
+                        };
+
+                        buf.push(ch);
+
+                        self.consume();
+                    }
+
+                    self.errors.push(SyntaxError::new(
+                        &format!("unexpected token `{}`", buf),
+                        &Span::new(&self.source, then, self.cursor - then))
+                    );
+
                     Token::Illegal
                 }
             }
@@ -359,7 +399,10 @@ impl Iterator for Lexer {
 
         self.consume();
 
-        Some((token, self.cursor - then))
+        Some(Spanned::new(
+            token,
+            Span::new(&self.source, then, self.cursor - then),
+        ))
     }
 }
 
@@ -367,9 +410,9 @@ impl Iterator for Lexer {
 mod test {
     use super::*;
 
-    fn compare_tokens(tests: &Vec<Token>, tokens: &Vec<Token>) {
+    fn compare_tokens(tests: &Vec<Token>, tokens: &Vec<Spanned<Token>>) {
         for (test, token) in tests.iter().zip(tokens.iter()) {
-            assert_eq!(test, token);
+            assert_eq!(*test, token.item);
         }
     }
 
@@ -378,7 +421,7 @@ mod test {
         let source = Source::pathless("   ");
         let tests = vec![Token::End];
 
-        compare_tokens(&tests, &lex(&source).unwrap());
+        compare_tokens(&tests, &lex(&source).0);
     }
 
     #[test]
@@ -393,7 +436,7 @@ mod test {
             Token::End,
         ];
 
-        compare_tokens(&tests, &lex(&source).unwrap());
+        compare_tokens(&tests, &lex(&source).0);
     }
 
     #[test]
@@ -439,7 +482,7 @@ mod test {
             Token::End,
         ];
 
-        compare_tokens(&tests, &lex(&source).unwrap());
+        compare_tokens(&tests, &lex(&source).0);
     }
 
     #[test]
@@ -461,7 +504,7 @@ mod test {
             Token::End,
         ];
 
-        compare_tokens(&tests, &lex(&source).unwrap());
+        compare_tokens(&tests, &lex(&source).0);
     }
 
     #[test]
@@ -482,7 +525,7 @@ mod test {
             Token::End,
         ];
 
-        compare_tokens(&tests, &lex(&source).unwrap());
+        compare_tokens(&tests, &lex(&source).0);
     }
 
     #[test]
@@ -496,7 +539,22 @@ mod test {
             Token::End,
         ];
 
-        compare_tokens(&tests, &lex(&source).unwrap());
+        compare_tokens(&tests, &lex(&source).0);
+    }
+
+    #[test]
+    fn spanned() {
+        let source = Source::pathless(" five ten \n");
+
+        let tests = vec![
+            Span::new(&source, 1, 4),
+            Span::new(&source, 6, 3),
+            Span::new(&source, 10, 1),
+        ];
+
+        for (spanned, test) in lex(&source).0.iter().zip(tests.iter()) {
+            assert_eq!(spanned.span, *test);
+        }
     }
 
     #[test]
@@ -553,6 +611,6 @@ mod test {
             Token::End,
         ];
 
-        compare_tokens(&tests, &lex(&source).unwrap());
+        compare_tokens(&tests, &lex(&source).0);
     }
 }
