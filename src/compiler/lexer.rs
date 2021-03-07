@@ -1,18 +1,18 @@
 use crate::{
     common::{source::Source, span::Span, span::Spanned},
     compiler::{
-        syntax_error::{SyntaxError, SyntaxErrors},
+        error::{LexerError, LexerErrors},
         token::Token,
     },
 };
 
 use std::{collections::HashMap, rc::Rc};
 
-pub struct Lexer {
+struct Lexer {
     // NOTE: should this be a normal borrow, rather than a reference counted one?
     source: Rc<Source>,
     cursor: usize,
-    errors: SyntaxErrors,
+    errors: LexerErrors,
 }
 
 pub type Tokens = Vec<Spanned<Token>>;
@@ -23,17 +23,21 @@ lazy_static! {
         String::from("fn")     => Token::Fn,
         String::from("return") => Token::Return,
         String::from("if")     => Token::If,
-        String::from("else")   => Token::Else
+        String::from("else")   => Token::Else,
+        String::from("while")  => Token::While,
+        String::from("for")    => Token::For
     };
 }
 
-pub fn lex(source: &Rc<Source>) -> (Tokens, SyntaxErrors) {
+pub type LResult<T> = Result<T, LexerErrors>;
+
+pub fn lex(source: &Rc<Source>) -> LResult<Tokens> {
     let mut lexer = Lexer::new(source);
     lexer.all()
 }
 
 impl Lexer {
-    pub fn new(source: &Rc<Source>) -> Lexer {
+    fn new(source: &Rc<Source>) -> Lexer {
         Lexer {
             source: Rc::clone(source),
             cursor: 0,
@@ -41,15 +45,24 @@ impl Lexer {
         }
     }
 
-    pub fn all(&mut self) -> (Tokens, SyntaxErrors) {
-        let mut tokens: Vec<_> = self.into_iter().collect();
+    fn all(&mut self) -> LResult<Tokens> {
+        let mut tokens: Tokens = Vec::new();
 
-        tokens.push(Spanned::new(
-            Token::End,
-            Span::new(&self.source, self.cursor, 0),
-        ));
+        loop {
+            let token = self.advance();
 
-        (tokens, self.errors.clone())
+            tokens.push(token.clone());
+
+            if token.item == Token::End {
+                break;
+            }
+        }
+
+        if !self.errors.is_empty() {
+            return Err(self.errors.clone());
+        }
+
+        Ok(tokens)
     }
 
     fn remaining(&self) -> &str {
@@ -111,15 +124,31 @@ impl Lexer {
     }
 
     fn consume(&mut self) {
-        if self.cursor < self.source.contents.len() {
-            self.cursor += 1;
+        if self.cursor >= self.source.contents.len() {
+            return;
         }
+
+        let mut len = 0;
+        
+        for c in self.remaining().chars().take(1) {
+            len += c.len_utf8();
+        }
+
+        self.cursor += len;
     }
 
     fn consume_n_minus_one(&mut self, n: usize) {
-        if self.cursor + n <= self.source.contents.len() {
-            self.cursor += n - 1;
+        if self.cursor + n > self.source.contents.len() {
+           return;
         }
+
+        let mut len = 0;
+
+        for c in self.remaining().chars().take(n - 1) {
+            len += c.len_utf8();
+        }
+
+        self.cursor += len;
     }
 
     fn expect(&mut self, ch: char) -> bool {
@@ -154,7 +183,6 @@ impl Lexer {
     fn read_string_literal(&mut self) -> Option<String> {
         let mut buf = String::new();
 
-        let then = self.cursor;
         self.consume();
 
         loop {
@@ -168,10 +196,9 @@ impl Lexer {
             if let Some(ch) = ch {
                 buf.push(ch);
             } else {
-                // TODO: Raise syntax error here
-                self.errors.push(SyntaxError::new(
+                self.errors.push(LexerError::new(
                     "unexpected EOF while scanning string literal",
-                    &Span::new(&self.source, then, self.cursor - then + 1)
+                    &Span::point(&self.source, self.cursor)
                 ));
 
                 break;
@@ -203,7 +230,6 @@ impl Lexer {
     }
 
     fn read_char_literal(&mut self) -> Option<char> {
-        let then = self.cursor;
         self.consume();
 
         let value = if self.current() == Some('\\') {
@@ -218,9 +244,9 @@ impl Lexer {
             value
         } else {
             if value == Some('\'') {
-                self.errors.push(SyntaxError::new(
+                self.errors.push(LexerError::new(
                     "cannot have empty char literal",
-                    &Span::new(&self.source, then, self.cursor - then)
+                    &Span::point(&self.source, self.cursor)
                 ));
                 return None;
             }
@@ -230,9 +256,9 @@ impl Lexer {
                 None => String::from("EOF")
             };
 
-            self.errors.push(SyntaxError::new(
+            self.errors.push(LexerError::new(
                 &format!("expected `'` at end of char literal, instead got {}", got),
-                &Span::new(&self.source, then, self.cursor - then + 1)
+                &Span::point(&self.source, self.cursor)
             ));
 
             None
@@ -274,12 +300,8 @@ impl Lexer {
 
         buffer.parse::<i64>().unwrap()
     }
-}
 
-impl Iterator for Lexer {
-    type Item = Spanned<Token>;
-
-    fn next(&mut self) -> Option<Self::Item> {
+    fn advance(&mut self) -> Spanned<Token> {
         self.strip_whitespace();
         self.strip_comments();
 
@@ -317,6 +339,7 @@ impl Iterator for Lexer {
             Some('{') => Token::OpenBrace,
             Some('}') => Token::CloseBrace,
             Some(':') => Token::Colon,
+            Some('.') => Token::Dot,
             Some(';') => Token::Semicolon,
             Some('+') => Token::Plus,
             Some('-') => match self.peek() {
@@ -363,7 +386,6 @@ impl Iterator for Lexer {
                 if Lexer::is_alpha(ch) {
                     let ident = self.read_identifier();
 
-                    // TODO: implement symbol matching
                     Lexer::lookup_keyword(ident)
                 } else if Lexer::is_numeric(ch) {
                     // TODO: implement float matching
@@ -386,7 +408,7 @@ impl Iterator for Lexer {
                         self.consume();
                     }
 
-                    self.errors.push(SyntaxError::new(
+                    self.errors.push(LexerError::new(
                         &format!("unexpected token `{}`", buf),
                         &Span::new(&self.source, then, self.cursor - then))
                     );
@@ -394,15 +416,15 @@ impl Iterator for Lexer {
                     Token::Illegal
                 }
             }
-            _ => return None,
+            _ => Token::End,
         };
 
         self.consume();
 
-        Some(Spanned::new(
+        Spanned::new(
             token,
             Span::new(&self.source, then, self.cursor - then),
-        ))
+        )
     }
 }
 
@@ -421,7 +443,7 @@ mod test {
         let source = Source::pathless("   ");
         let tests = vec![Token::End];
 
-        compare_tokens(&tests, &lex(&source).0);
+        compare_tokens(&tests, &lex(&source).unwrap());
     }
 
     #[test]
@@ -436,7 +458,7 @@ mod test {
             Token::End,
         ];
 
-        compare_tokens(&tests, &lex(&source).0);
+        compare_tokens(&tests, &lex(&source).unwrap());
     }
 
     #[test]
@@ -482,7 +504,7 @@ mod test {
             Token::End,
         ];
 
-        compare_tokens(&tests, &lex(&source).0);
+        compare_tokens(&tests, &lex(&source).unwrap());
     }
 
     #[test]
@@ -504,7 +526,7 @@ mod test {
             Token::End,
         ];
 
-        compare_tokens(&tests, &lex(&source).0);
+        compare_tokens(&tests, &lex(&source).unwrap());
     }
 
     #[test]
@@ -525,7 +547,7 @@ mod test {
             Token::End,
         ];
 
-        compare_tokens(&tests, &lex(&source).0);
+        compare_tokens(&tests, &lex(&source).unwrap());
     }
 
     #[test]
@@ -539,7 +561,7 @@ mod test {
             Token::End,
         ];
 
-        compare_tokens(&tests, &lex(&source).0);
+        compare_tokens(&tests, &lex(&source).unwrap());
     }
 
     #[test]
@@ -552,7 +574,7 @@ mod test {
             Span::new(&source, 10, 1),
         ];
 
-        for (spanned, test) in lex(&source).0.iter().zip(tests.iter()) {
+        for (spanned, test) in lex(&source).unwrap().iter().zip(tests.iter()) {
             assert_eq!(spanned.span, *test);
         }
     }
@@ -611,6 +633,6 @@ mod test {
             Token::End,
         ];
 
-        compare_tokens(&tests, &lex(&source).0);
+        compare_tokens(&tests, &lex(&source).unwrap());
     }
 }

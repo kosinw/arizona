@@ -85,7 +85,6 @@ mod test {
     fn codespan() {
         let source = Source::pathless("let a = 3");
 
-        assert_eq!(String::from("[no path]"), source.name(()).unwrap());
         assert_eq!(source.contents, source.source(()).unwrap());
         assert_eq!(0, source.line_index((), 3).unwrap());
     }

@@ -69,11 +69,6 @@ impl Span {
 
         return combined;
     }
-
-    pub fn contents(&self) -> String {
-        if self.is_empty() { panic!("An empty span does not have any contents") }
-        self.source.as_ref().unwrap().contents[self.offset..(self.end())].to_string()
-    }
 }
 
 impl<T> Spanned<T> {

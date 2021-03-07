@@ -1,9 +1,12 @@
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
     // Delimeters
-    OpenBracket, CloseBracket,
-    OpenParen, CloseParen,
-    OpenBrace, CloseBrace,
+    OpenBracket,
+    CloseBracket,
+    OpenParen,
+    CloseParen,
+    OpenBrace,
+    CloseBrace,
 
     // Punctuation
     Semicolon,
@@ -12,9 +15,9 @@ pub enum Token {
     Newline,
 
     // Arithmetic operators
-    Plus, 
-    Minus, 
-    Slash, 
+    Plus,
+    Minus,
+    Slash,
     Asterisk,
     Mod,
 
@@ -41,9 +44,9 @@ pub enum Token {
     ModAssign,
 
     // Keywords
-    If, 
-    Else, 
-    For, 
+    If,
+    Else,
+    For,
     While,
     Fn,
     Enum,
@@ -67,7 +70,6 @@ pub enum Token {
 
     // Illegal
     Illegal,
-    
     // EOF
-    End
+    End,
 }

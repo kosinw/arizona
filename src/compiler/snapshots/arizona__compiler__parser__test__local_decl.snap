@@ -1,0 +1,42 @@
+---
+source: src/compiler/parser.rs
+expression: let_stmt
+
+---
+Ok(
+    Spanned {
+        item: LetExpr(
+            Spanned {
+                item: "i",
+                span: Span {
+                    offset: 4,
+                    length: 1,
+                    source: Some(
+                        Source {
+                            contents: "let i;",
+                            path: "<stdin>",
+                            line_starts: [
+                                0,
+                            ],
+                        },
+                    ),
+                },
+            },
+            None,
+            None,
+        ),
+        span: Span {
+            offset: 0,
+            length: 6,
+            source: Some(
+                Source {
+                    contents: "let i;",
+                    path: "<stdin>",
+                    line_starts: [
+                        0,
+                    ],
+                },
+            ),
+        },
+    },
+)

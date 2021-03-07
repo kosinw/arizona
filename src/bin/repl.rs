@@ -1,7 +1,6 @@
 extern crate arizona;
-use arizona::compiler::lexer::lex;
-use arizona::common::source::Source;
-use arizona::compiler::syntax_error::report;
+
+use arizona::{common::source::*, compiler::error::*, compiler::lexer::*, common::span::*};
 
 extern crate rustyline;
 
@@ -9,8 +8,14 @@ static BINARY_VERSION: &'static str = env!("CARGO_PKG_VERSION");
 static PROMPT: &'static str = ">>> ";
 
 fn main() {
-    println!("Arizona Programming Language {} (written by Kosi Nwabueze)", BINARY_VERSION);
-    println!(r#"Type "{}" or "{}" for more information."#, "help", "license");
+    println!(
+        "Arizona Programming Language {} (written by Kosi Nwabueze)",
+        BINARY_VERSION
+    );
+    println!(
+        r#"Type "{}" or "{}" for more information."#,
+        "help", "license"
+    );
     let mut rl = rustyline::Editor::<()>::new();
 
     loop {
@@ -19,17 +24,22 @@ fn main() {
         match readline {
             Ok(line) => {
                 let source = Source::pathless(&line);
-                let (tokens, errors) = lex(&source);
 
-                if !errors.is_empty() {
-                    report(&errors).unwrap();
-                }
+                let tokens = match lex(&source) {
+                    Ok(tokens) => {
+                        for Spanned { item, ..} in tokens.clone() {
+                            println!("{:?}", item);
+                        }
 
-                for token in tokens {
-                    println!("{:?}", token);
-                }
+                        tokens
+                    }
+                    Err(errors) => {
+                        report(&errors).unwrap();
+                        continue;
+                    }
+                };
             }
-            Err(_) => break
+            Err(_) => break,
         }
     }
 }

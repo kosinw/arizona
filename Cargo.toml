@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 lazy_static = "*"
 maplit = "1.0.2"
-codespan = "0.11.1"
 codespan-reporting = "0.11.1"
 termcolor = "*"
 rustyline = "7.1.0"
+insta = { version = "1.7.0" }
