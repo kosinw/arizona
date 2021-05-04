@@ -1,3 +1,9 @@
 {
-  "extends": "@tsconfig/node14/tsconfig.json"
+  "extends": "@tsconfig/node14/tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,                         /* Generates corresponding '.d.ts' file. */
+    "declarationMap": true,                      /* Generates a sourcemap for each corresponding '.d.ts' file. */
+    "composite": true,                           /* Enable project compilation */
+    "lib": ["esnext"]
+  }
 }

@@ -1,3 +1,5 @@
+import { SourceFile } from "./common/source";
+
 // TODO(kosi): Add field for syntax tree.
 export interface CompileResult {
   text: string;
@@ -20,6 +22,8 @@ export function compile(
   options?: CompileOptions
 ): CompileResult {
   const { filename = 'unknown.az' } = options || {};
+
+   const file = new SourceFile(source, filename);
 
   throw 'unimplemented';
 }
