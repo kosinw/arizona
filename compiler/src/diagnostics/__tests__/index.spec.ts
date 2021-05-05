@@ -53,8 +53,6 @@ describe('diagnostics/index.ts', () => {
 
     const m = diagnostics.formatDiagnosticMessage(diagnostic, true);
 
-    console.log(m);
-
     expect(m).toMatchInlineSnapshot(`
       "[31m-- DUMMY ERROR ---------------------------------------------- test/unknown.az[39m
 

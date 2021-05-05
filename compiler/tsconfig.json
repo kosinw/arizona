@@ -6,8 +6,8 @@
     "resolveJsonModule": true,
     "noImplicitAny": false,
     "lib": [
-      "esnext"
-    ]
+      "esnext",
+    ],
   },
   "exclude": [
     "src/**/*.spec.ts"

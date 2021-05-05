@@ -11,6 +11,17 @@ export enum DiagnosticLevel {
   ERROR = 'ERROR',
 }
 
+export interface DiagnosticEntry {
+  code: number;
+  title: string;
+  preamble?: string;
+  message?: string;
+}
+
+export interface DiagnosticEntryTable {
+  [code: number]: DiagnosticEntry;
+}
+
 export type DiagnosticColor = 'cyan' | 'yellow' | 'red';
 
 export function diagnosticLevelToColor(

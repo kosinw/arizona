@@ -9,7 +9,8 @@
     "build": "tsc",
     "test": "jest",
     "test:watch": "jest --watch",
-    "gen:diagnostics": "ts-node scripts/generate-diagnostics.ts"
+    "gen:diagnostics": "ts-node scripts/generate-diagnostics.ts",
+    "grammar": "nearleyc -o src/parser/grammar.ts src/parser/grammar.ne"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,7 @@
     "@babel/code-frame": "^7.12.13",
     "binaryen": "^101.0.0",
     "chalk": "^4.1.1",
+    "curry": "^1.2.0",
     "dedent": "^0.7.0",
     "invariant": "^2.2.4",
     "line-column": "^1.0.2",

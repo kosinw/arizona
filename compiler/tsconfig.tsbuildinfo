@@ -191,9 +191,19 @@
         "signature": "506b80b9951c9381dc5f11897b31fca5e2a65731d96ddefa19687fbc26b23c6e",
         "affectsGlobalScope": true
       },
+      "../node_modules/@types/invariant/index.d.ts": {
+        "version": "6acf8a984c2728906edeba2098c5c51f44a4520bc4a48c65b973bd785537178f",
+        "signature": "6acf8a984c2728906edeba2098c5c51f44a4520bc4a48c65b973bd785537178f",
+        "affectsGlobalScope": false
+      },
+      "./src/common/source.ts": {
+        "version": "688a66b0c119676610121aed0fb77e75102ef36421663386565b4f582ba32333",
+        "signature": "a26d25980bf50228aeb5545765b4d94f8e540e0c2016e0d16c336e14f8063ca0",
+        "affectsGlobalScope": false
+      },
       "./src/index.ts": {
-        "version": "c827ea8445cb16a1921f8bf9c8bab00ed1c62714e588ab8ba28c9a6c80827f33",
-        "signature": "579ef99cf37cc18989b18d8b7b174c432ad64cf4f82c43efd8d853eed39e59cf",
+        "version": "cbff2bd390eadadfb95f6ff967f181a0d2ac4a468edbd0050cc4a54c1864513d",
+        "signature": "17487d3a847605ba13b0fa4c8825e8c63b060aa06a60d323dfec974800cee6b6",
         "affectsGlobalScope": false
       },
       "../node_modules/@babel/types/lib/index.d.ts": {
@@ -224,6 +234,11 @@
       "../node_modules/@types/babel__core/index.d.ts": {
         "version": "6f1d39d26959517da3bd105c552eded4c34702705c64d75b03f54d864b6e41c2",
         "signature": "6f1d39d26959517da3bd105c552eded4c34702705c64d75b03f54d864b6e41c2",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@types/dedent/index.d.ts": {
+        "version": "70646d9cb37b62611766d18a9bcca6cbf28ca9aec33a66244e974056ab1193f6",
+        "signature": "70646d9cb37b62611766d18a9bcca6cbf28ca9aec33a66244e974056ab1193f6",
         "affectsGlobalScope": false
       },
       "../node_modules/@types/node/assert/strict.d.ts": {
@@ -481,11 +496,6 @@
         "signature": "3ebae8c00411116a66fca65b08228ea0cf0b72724701f9b854442100aab55aba",
         "affectsGlobalScope": false
       },
-      "../node_modules/@types/invariant/index.d.ts": {
-        "version": "6acf8a984c2728906edeba2098c5c51f44a4520bc4a48c65b973bd785537178f",
-        "signature": "6acf8a984c2728906edeba2098c5c51f44a4520bc4a48c65b973bd785537178f",
-        "affectsGlobalScope": false
-      },
       "../node_modules/@types/istanbul-lib-coverage/index.d.ts": {
         "version": "de18acda71730bac52f4b256ce7511bb56cc21f6f114c59c46782eff2f632857",
         "signature": "de18acda71730bac52f4b256ce7511bb56cc21f6f114c59c46782eff2f632857",
@@ -599,12 +609,18 @@
       "forceConsistentCasingInFileNames": true,
       "declaration": true,
       "declarationMap": true,
+      "composite": true,
       "outDir": "./dist",
       "rootDir": "./src",
-      "composite": true,
       "configFilePath": "./tsconfig.json"
     },
     "referencedMap": {
+      "./src/common/source.ts": [
+        "../node_modules/@types/invariant/index.d.ts"
+      ],
+      "./src/index.ts": [
+        "./src/common/source.ts"
+      ],
       "../node_modules/@babel/parser/typings/babel-parser.d.ts": [
         "../node_modules/@babel/types/lib/index.d.ts"
       ],
@@ -1215,6 +1231,7 @@
       ]
     },
     "semanticDiagnosticsPerFile": [
+      "./src/common/source.ts",
       "./src/index.ts",
       "../node_modules/@babel/parser/typings/babel-parser.d.ts",
       "../node_modules/@babel/types/lib/index.d.ts",
@@ -1222,6 +1239,7 @@
       "../node_modules/@types/babel__generator/index.d.ts",
       "../node_modules/@types/babel__template/index.d.ts",
       "../node_modules/@types/babel__traverse/index.d.ts",
+      "../node_modules/@types/dedent/index.d.ts",
       "../node_modules/@types/graceful-fs/index.d.ts",
       "../node_modules/@types/invariant/index.d.ts",
       "../node_modules/@types/istanbul-lib-coverage/index.d.ts",
