@@ -1,17 +1,20 @@
-import { Lexer } from '.';
 import curry from 'curry';
 
 export enum SyntaxType {
-  Type = 'type',
-  Identifier = 'identifier',
-  IntegerLiteral = 'integer',
-  FloatLiteral = 'float',
-  StringLiteral = 'string',
-  CharLiteral = 'char',
-  BoolLiteral = 'bool',
-  AccessExpression = 'access',
-  ArraySubscript = 'subscript',
-  FunctionCall = 'call',
+  Type = 'Type',
+  Identifier = 'Identifier',
+  IntegerLiteral = 'IntegerLiteral',
+  FloatLiteral = 'FloatLiteral',
+  StringLiteral = 'StringLiteral',
+  CharLiteral = 'CharLiteral',
+  BoolLiteral = 'BoolLiteral',
+  AccessExpression = 'AccessExpression',
+  ArraySubscript = 'ArraySubscript',
+  FunctionCall = 'FunctionCall',
+  UnaryExpression = 'UnaryExpression',
+  BinaryExpression = 'BinaryExpression',
+  AssignmentStatement = 'AssignmentStatement',
+  ReturnStatement = 'ReturnStatement',
 }
 
 export interface Syn {
@@ -19,23 +22,8 @@ export interface Syn {
   value: any;
   staticType: string | null;
   meta: { [x: string]: any };
-  span: [any, any];
   params: any[];
 }
-
-const marker = (lexer: Lexer) => {
-  const { col, line } = lexer;
-
-  if (!lexer.lines.length) {
-    return { col, line, sourceLine: '' };
-  }
-
-  return {
-    col,
-    line,
-    sourceLine: lexer.lines[lexer.line - 1],
-  };
-};
 
 export const nil = (d) => null;
 export const nth = (n) => (d): Syn => d[n];
@@ -69,22 +57,16 @@ const extendNode = curry(({ meta, ...options }: any, node: { meta: any }) => {
 export const compose = (...fns: any) =>
   fns.reduce((f: any, g: any) => (...args: any[]) => f(g(...args)));
 
-export default function factory(lexer: Lexer) {
+export default function factory() {
   const node = (type: SyntaxType, seed: any = {}) => (d: Syn[]): Syn => {
     const params = d.filter(nonEmpty);
     const { value = '', meta = {} } = seed;
-    const start = marker(lexer);
-    const end =
-      params[params.length - 1] && params[params.length - 1].span
-        ? params[params.length - 1].span[1]
-        : { ...start, col: start.col + value.length };
 
     return {
       value,
       staticType: null,
       type,
       meta,
-      span: [start, end],
       params,
     };
   };
@@ -163,7 +145,7 @@ export default function factory(lexer: Lexer) {
   };
 
   const subscript = (d): Syn => {
-    const [id, field] = d.filter(nonEmpty);
+    const [id, field] = drop(d);
 
     return extendNode(
       {
@@ -185,6 +167,42 @@ export default function factory(lexer: Lexer) {
     );
   };
 
+  const unary = ([opeartor, target]) => {
+    return extendNode(
+      {
+        value: opeartor.value,
+        params: [target],
+      },
+      node(SyntaxType.UnaryExpression)([opeartor, target])
+    );
+  };
+
+  const binary = (d) => {
+    const [lhs, operator, rhs] = drop(d);
+
+    return node(SyntaxType.BinaryExpression, { value: operator.value })([
+      lhs,
+      rhs,
+    ]);
+  };
+
+  const assignment = (d) => {
+    const [lhs, operator, rhs] = drop(d);
+    const { value }: { value: string } = operator;
+
+    if (['-=', '+='].includes(value)) {
+      const op = value[0];
+      const b = binary([lhs, { value: op }, rhs]);
+      return node(SyntaxType.AssignmentStatement, { value: '=' })([lhs, b]);
+    }
+
+    return node(SyntaxType.AssignmentStatement, { value })([lhs, rhs]);
+  };
+
+  const return_ = (d) => {
+    return node(SyntaxType.ReturnStatement)(d);
+  };
+
   return {
     string,
     char,
@@ -195,5 +213,10 @@ export default function factory(lexer: Lexer) {
     type,
     access,
     subscript,
+    assignment,
+    call,
+    unary,
+    binary,
+    return: return_,
   };
 }

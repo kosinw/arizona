@@ -1,0 +1,244 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`parser tests basic parsing (arithmetic expressions) 1`] = `
+Array [
+  Object {
+    "meta": Object {},
+    "params": Array [
+      Object {
+        "meta": Object {},
+        "params": Array [],
+        "staticType": null,
+        "type": "Identifier",
+        "value": "a",
+      },
+      Object {
+        "meta": Object {},
+        "params": Array [
+          Object {
+            "meta": Object {},
+            "params": Array [
+              Object {
+                "meta": Object {},
+                "params": Array [
+                  Object {
+                    "meta": Object {},
+                    "params": Array [
+                      Object {
+                        "meta": Object {},
+                        "params": Array [],
+                        "staticType": "i32",
+                        "type": "IntegerLiteral",
+                        "value": 1,
+                      },
+                      Object {
+                        "meta": Object {},
+                        "params": Array [],
+                        "staticType": "i32",
+                        "type": "IntegerLiteral",
+                        "value": 3,
+                      },
+                    ],
+                    "staticType": null,
+                    "type": "BinaryExpression",
+                    "value": "+",
+                  },
+                  Object {
+                    "meta": Object {},
+                    "params": Array [
+                      Object {
+                        "meta": Object {},
+                        "params": Array [],
+                        "staticType": "i32",
+                        "type": "IntegerLiteral",
+                        "value": 4,
+                      },
+                      Object {
+                        "meta": Object {},
+                        "params": Array [],
+                        "staticType": "i32",
+                        "type": "IntegerLiteral",
+                        "value": 18,
+                      },
+                    ],
+                    "staticType": null,
+                    "type": "BinaryExpression",
+                    "value": "*",
+                  },
+                ],
+                "staticType": null,
+                "type": "BinaryExpression",
+                "value": "-",
+              },
+              Object {
+                "meta": Object {},
+                "params": Array [],
+                "staticType": "i32",
+                "type": "IntegerLiteral",
+                "value": 2,
+              },
+            ],
+            "staticType": null,
+            "type": "BinaryExpression",
+            "value": "^",
+          },
+          Object {
+            "meta": Object {},
+            "params": Array [
+              Object {
+                "meta": Object {},
+                "params": Array [
+                  Object {
+                    "meta": Object {},
+                    "params": Array [],
+                    "staticType": "i32",
+                    "type": "IntegerLiteral",
+                    "value": 8,
+                  },
+                  Object {
+                    "meta": Object {},
+                    "params": Array [],
+                    "staticType": "i32",
+                    "type": "IntegerLiteral",
+                    "value": 2,
+                  },
+                ],
+                "staticType": null,
+                "type": "BinaryExpression",
+                "value": "/",
+              },
+              Object {
+                "meta": Object {},
+                "params": Array [],
+                "staticType": "i32",
+                "type": "IntegerLiteral",
+                "value": 13,
+              },
+            ],
+            "staticType": null,
+            "type": "BinaryExpression",
+            "value": "%",
+          },
+        ],
+        "staticType": null,
+        "type": "BinaryExpression",
+        "value": "==",
+      },
+    ],
+    "staticType": null,
+    "type": "AssignmentStatement",
+    "value": "=",
+  },
+]
+`;
+
+exports[`parser tests more parsing (assignments statements) 1`] = `
+Array [
+  Object {
+    "meta": Object {},
+    "params": Array [
+      Object {
+        "meta": Object {},
+        "params": Array [],
+        "staticType": null,
+        "type": "Identifier",
+        "value": "a",
+      },
+      Object {
+        "meta": Object {},
+        "params": Array [
+          Object {
+            "meta": Object {},
+            "params": Array [],
+            "staticType": null,
+            "type": "Identifier",
+            "value": "a",
+          },
+          Object {
+            "meta": Object {},
+            "params": Array [],
+            "staticType": "i32",
+            "type": "IntegerLiteral",
+            "value": 15,
+          },
+        ],
+        "staticType": null,
+        "type": "BinaryExpression",
+        "value": "+",
+      },
+    ],
+    "staticType": null,
+    "type": "AssignmentStatement",
+    "value": "=",
+  },
+]
+`;
+
+exports[`parser tests more parsing (assignments statements) 2`] = `
+Array [
+  Object {
+    "meta": Object {},
+    "params": Array [
+      Object {
+        "meta": Object {},
+        "params": Array [],
+        "staticType": null,
+        "type": "Identifier",
+        "value": "a",
+      },
+      Object {
+        "meta": Object {},
+        "params": Array [],
+        "staticType": "i32",
+        "type": "IntegerLiteral",
+        "value": 23,
+      },
+    ],
+    "staticType": null,
+    "type": "AssignmentStatement",
+    "value": "=",
+  },
+]
+`;
+
+exports[`parser tests more parsing (assignments statements) 3`] = `
+Array [
+  Object {
+    "meta": Object {},
+    "params": Array [
+      Object {
+        "meta": Object {},
+        "params": Array [],
+        "staticType": null,
+        "type": "Identifier",
+        "value": "a",
+      },
+      Object {
+        "meta": Object {},
+        "params": Array [
+          Object {
+            "meta": Object {},
+            "params": Array [],
+            "staticType": null,
+            "type": "Identifier",
+            "value": "a",
+          },
+          Object {
+            "meta": Object {},
+            "params": Array [],
+            "staticType": "i32",
+            "type": "IntegerLiteral",
+            "value": 15,
+          },
+        ],
+        "staticType": null,
+        "type": "BinaryExpression",
+        "value": "-",
+      },
+    ],
+    "staticType": null,
+    "type": "AssignmentStatement",
+    "value": "=",
+  },
+]
+`;

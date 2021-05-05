@@ -11,12 +11,12 @@ declare var string: any;
 declare var char: any;
 declare var bool: any;
 
-    import * as moo from 'moo';
-    import { makeLexer } from '.';
-    import factory, { flatten, nth, nil, compose, drop } from './syntax';
+import * as moo from 'moo';
+import { makeLexer } from '.';
+import makeSyntaxTypes, { flatten, nth, nil, compose, drop } from './syntax';
 
-    const lexer = makeLexer();
-    const syntax = factory(lexer);
+const lexer = makeLexer();
+const syntax = makeSyntaxTypes();
 
 interface NearleyToken {
   value: any;
@@ -55,8 +55,51 @@ const grammar: Grammar = {
     {"name": "__$ebnf$1", "symbols": ["__$ebnf$1", "wschar"], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "__", "symbols": ["__$ebnf$1"], "postprocess": function(d) {return null;}},
     {"name": "wschar", "symbols": [/[ \t\n\v\f]/], "postprocess": id},
-    {"name": "Expression", "symbols": ["AssignmentExpression"], "postprocess": id},
-    {"name": "AssignmentExpression", "symbols": ["Subscript"], "postprocess": id},
+    {"name": "Statement", "symbols": ["ExpressionStatement"], "postprocess": id},
+    {"name": "Statement", "symbols": ["AssignmentStatement"], "postprocess": id},
+    {"name": "Statement", "symbols": ["ReturnStatement"], "postprocess": id},
+    {"name": "ReturnStatement", "symbols": ["RETURN", "__", "Expression", "TERMINATOR"], "postprocess": syntax.return},
+    {"name": "ReturnStatement", "symbols": ["RETURN", "TERMINATOR"], "postprocess": syntax.return},
+    {"name": "AssignmentStatement", "symbols": ["_Assignment", "TERMINATOR"], "postprocess": id},
+    {"name": "_Assignment", "symbols": ["Subscript", "_", {"literal":"="}, "_", "Expression"], "postprocess": syntax.assignment},
+    {"name": "_Assignment", "symbols": ["Subscript", "_", {"literal":"+="}, "_", "Expression"], "postprocess": syntax.assignment},
+    {"name": "_Assignment", "symbols": ["Subscript", "_", {"literal":"-="}, "_", "Expression"], "postprocess": syntax.assignment},
+    {"name": "_Assignment", "symbols": ["Subscript", "_", {"literal":"/="}, "_", "Expression"], "postprocess": syntax.assignment},
+    {"name": "_Assignment", "symbols": ["Subscript", "_", {"literal":"*="}, "_", "Expression"], "postprocess": syntax.assignment},
+    {"name": "_Assignment", "symbols": ["Subscript", "_", {"literal":"%="}, "_", "Expression"], "postprocess": syntax.assignment},
+    {"name": "ExpressionStatement", "symbols": ["Expression", "TERMINATOR"], "postprocess": id},
+    {"name": "Expression", "symbols": ["Binary"], "postprocess": id},
+    {"name": "Binary", "symbols": ["Logical"], "postprocess": id},
+    {"name": "Logical", "symbols": ["Logical", "_", {"literal":"||"}, "_", "Bitwise"], "postprocess": syntax.binary},
+    {"name": "Logical", "symbols": ["Logical", "_", {"literal":"&&"}, "_", "Bitwise"], "postprocess": syntax.binary},
+    {"name": "Logical", "symbols": ["Bitwise"], "postprocess": id},
+    {"name": "Bitwise", "symbols": ["Bitwise", "_", {"literal":"|"}, "_", "Sum"], "postprocess": syntax.binary},
+    {"name": "Bitwise", "symbols": ["Bitwise", "_", {"literal":"^"}, "_", "Sum"], "postprocess": syntax.binary},
+    {"name": "Bitwise", "symbols": ["Bitwise", "_", {"literal":"&"}, "_", "Sum"], "postprocess": syntax.binary},
+    {"name": "Bitwise", "symbols": ["Equality"], "postprocess": id},
+    {"name": "Equality", "symbols": ["Equality", "_", {"literal":"=="}, "_", "Comparison"], "postprocess": syntax.binary},
+    {"name": "Equality", "symbols": ["Equality", "_", {"literal":"!="}, "_", "Comparison"], "postprocess": syntax.binary},
+    {"name": "Equality", "symbols": ["Comparison"], "postprocess": id},
+    {"name": "Comparison", "symbols": ["Comparison", "_", {"literal":"<"}, "_", "Shift"], "postprocess": syntax.binary},
+    {"name": "Comparison", "symbols": ["Comparison", "_", {"literal":">"}, "_", "Shift"], "postprocess": syntax.binary},
+    {"name": "Comparison", "symbols": ["Comparison", "_", {"literal":"<="}, "_", "Shift"], "postprocess": syntax.binary},
+    {"name": "Comparison", "symbols": ["Comparison", "_", {"literal":">="}, "_", "Shift"], "postprocess": syntax.binary},
+    {"name": "Comparison", "symbols": ["Shift"], "postprocess": id},
+    {"name": "Shift", "symbols": ["Shift", "_", {"literal":">>"}, "_", "Sum"], "postprocess": syntax.binary},
+    {"name": "Shift", "symbols": ["Shift", "_", {"literal":"<<"}, "_", "Sum"], "postprocess": syntax.binary},
+    {"name": "Shift", "symbols": ["Sum"], "postprocess": id},
+    {"name": "Sum", "symbols": ["Sum", "_", {"literal":"+"}, "_", "Product"], "postprocess": syntax.binary},
+    {"name": "Sum", "symbols": ["Sum", "_", {"literal":"-"}, "_", "Product"], "postprocess": syntax.binary},
+    {"name": "Sum", "symbols": ["Product"], "postprocess": id},
+    {"name": "Product", "symbols": ["Product", "_", {"literal":"*"}, "_", "Unary"], "postprocess": syntax.binary},
+    {"name": "Product", "symbols": ["Product", "_", {"literal":"/"}, "_", "Unary"], "postprocess": syntax.binary},
+    {"name": "Product", "symbols": ["Product", "_", {"literal":"%"}, "_", "Unary"], "postprocess": syntax.binary},
+    {"name": "Product", "symbols": ["Unary"], "postprocess": id},
+    {"name": "Unary", "symbols": [{"literal":"!"}, "Call"], "postprocess": syntax.unary},
+    {"name": "Unary", "symbols": [{"literal":"~"}, "Call"], "postprocess": syntax.unary},
+    {"name": "Unary", "symbols": [{"literal":"!"}, "Call"], "postprocess": syntax.unary},
+    {"name": "Unary", "symbols": [{"literal":"+"}, "Call"], "postprocess": syntax.unary},
+    {"name": "Unary", "symbols": ["Call"], "postprocess": id},
     {"name": "Call", "symbols": ["Subscript", "_", "LP", "_", "ArgumentList", "_", "RP"], "postprocess": compose(syntax.call, flatten)},
     {"name": "Call", "symbols": ["Subscript", "_", "LP", "_", "RP"], "postprocess": syntax.call},
     {"name": "Call", "symbols": ["Subscript"], "postprocess": id},
@@ -86,9 +129,12 @@ const grammar: Grammar = {
     {"name": "LSB", "symbols": [{"literal":"["}], "postprocess": nil},
     {"name": "RSB", "symbols": [{"literal":"]"}], "postprocess": nil},
     {"name": "LP", "symbols": [{"literal":"("}], "postprocess": nil},
+    {"name": "RANGLE", "symbols": [{"literal":">"}], "postprocess": nil},
     {"name": "RP", "symbols": [{"literal":")"}], "postprocess": nil},
     {"name": "DOT", "symbols": [{"literal":"."}], "postprocess": nil},
     {"name": "COMMA", "symbols": [{"literal":","}], "postprocess": nil},
+    {"name": "LANGLE", "symbols": [{"literal":"<"}], "postprocess": nil},
+    {"name": "TERMINATOR", "symbols": ["_", {"literal":";"}], "postprocess": nil},
     {"name": "FN", "symbols": [{"literal":"fn"}], "postprocess": nil},
     {"name": "LET", "symbols": [{"literal":"let"}], "postprocess": nil},
     {"name": "CONST", "symbols": [{"literal":"const"}], "postprocess": nil},
@@ -103,7 +149,7 @@ const grammar: Grammar = {
     {"name": "WHILE", "symbols": [{"literal":"while"}], "postprocess": nil},
     {"name": "BREAK", "symbols": [{"literal":"break"}], "postprocess": nil}
   ],
-  ParserStart: "Expression",
+  ParserStart: "Statement",
 };
 
 export default grammar;
