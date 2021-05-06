@@ -11,7 +11,7 @@ const parseThenGenerate = (src: string): GeneratorResult => {
 describe('parser tests', () => {
   it('can parse a very complex program', () => {
     const src = dedent`
-      export fn echo(a: i32, b: f64) -> i32 {
+      export fn echo(a: i32, b: i32) -> i32 {
           let foo: i32 = 42;
       }
     `;

@@ -79,12 +79,6 @@ Object {
         Object {
           "params": Array [
             Object {
-              "params": Array [],
-              "staticType": null,
-              "type": "Identifier",
-              "value": "echo",
-            },
-            Object {
               "params": Array [
                 Object {
                   "params": Array [

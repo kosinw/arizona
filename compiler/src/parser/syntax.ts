@@ -207,7 +207,7 @@ export default function factory() {
 
   const fn = (d) => {
     const params = drop(d);
-    const [name, _, result] = params;
+    const [name, args, result, block] = params;
 
     if (result.value === 'void') {
       return voidfn(d);
@@ -216,6 +216,7 @@ export default function factory() {
     return extendNode(
       {
         value: name.value,
+        params: [args, result, block]
       },
       node(SyntaxType.FunctionDeclaration)(params)
     );
