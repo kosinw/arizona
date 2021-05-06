@@ -1,50 +1,7 @@
 import curry from 'curry';
+import { Syn, SyntaxType } from './types';
 
-export enum SyntaxType {
-  Type = 'Type',
-  DeclType = 'DeclType',
-  Identifier = 'Identifier',
-  IntegerLiteral = 'IntegerLiteral',
-  FloatLiteral = 'FloatLiteral',
-  StringLiteral = 'StringLiteral',
-  CharLiteral = 'CharLiteral',
-  BoolLiteral = 'BoolLiteral',
-  AccessExpression = 'AccessExpression',
-  ArraySubscript = 'ArraySubscript',
-  FunctionCall = 'FunctionCall',
-  UnaryExpression = 'UnaryExpression',
-  BinaryExpression = 'BinaryExpression',
-  AssignmentStatement = 'AssignmentStatement',
-  ReturnStatement = 'ReturnStatement',
-  ImmutableDeclaration = 'ImmutableDeclaration',
-  VariableDeclaration = 'VariableDeclaration',
-  GlobalImmutableDeclaration = 'GlobalImmutableDeclaration',
-  GlobalVariableDeclaration = 'GlobalVariableDeclaration',
-  Pair = 'Pair',
-  RootNode = 'RootNode',
-  FunctionResult = 'FunctionResult',
-  FunctionDeclaration = 'FunctionDeclaration',
-  FunctionParameters = 'FunctionParameters',
-  Block = 'Block',
-  Export = 'Export',
-  IfStatement = 'IfStatement',
-  ElseStatement = 'ElseStatement',
-  LoopStatement = 'LoopStatement',
-  BreakStatement = 'BreakStatement',
-  ContinueStatement = 'ContinueStatement',
-  Noop = 'Noop',
-  UseFunctionDeclaration = 'UseFunctionDeclaration',
-  FunctionHeaderDeclaration = 'FunctionHeaderDeclaration',
-}
-
-export interface Syn {
-  type: SyntaxType;
-  value: any;
-  staticType: string | null;
-  meta: { [x: string]: any };
-  params: any[];
-}
-
+// TODO(kosi): Come back and fix all this type shit
 export const nil = (d) => null;
 export const nth = (n) => (d): Syn => d[n];
 export const flatten = (d) =>
@@ -60,21 +17,16 @@ export const nonEmpty = (d) => {
   return Array.isArray(d) ? !!d.length : d != null;
 };
 
-export const drop = (d): Syn[] => {
+export const drop = (d): any[] => {
   return d.filter(nonEmpty);
 };
 
-export const add = (d) => `${d[0]}${d[1]}`;
-
-export const extendNode = curry(
-  ({ meta, ...options }: any, node: { meta: any }) => {
-    return {
-      ...node,
-      meta: { ...node.meta, ...meta },
-      ...options,
-    };
-  }
-);
+export const extendNode = curry(({ ...options }: any, node) => {
+  return {
+    ...node,
+    ...options,
+  };
+});
 
 export const compose = (...fns: any) =>
   fns.reduce((f: any, g: any) => (...args: any[]) => f(g(...args)));
@@ -82,13 +34,12 @@ export const compose = (...fns: any) =>
 export default function factory() {
   const node = (type: SyntaxType, seed: any = {}) => (d: Syn[]): Syn => {
     const params = drop(d);
-    const { value = '', meta = {} } = seed;
+    const { value = '' } = seed;
 
     return {
       value,
       staticType: null,
       type,
-      meta,
       params,
     };
   };
@@ -116,7 +67,7 @@ export default function factory() {
   const float = (d): Syn => {
     return extendNode(
       {
-        value: parseFloat(d[0].value.replaceAll('_', '')),
+        value: parseFloat(d[0].value.replace('_', '')),
         staticType: 'f32',
       },
       node(SyntaxType.FloatLiteral)([])
@@ -136,7 +87,7 @@ export default function factory() {
   const integer = (d): Syn => {
     return extendNode(
       {
-        value: parseInt(d[0].value.replaceAll('_', '')),
+        value: parseInt(d[0].value.replace('_', '')),
         staticType: 'i32',
       },
       node(SyntaxType.IntegerLiteral)([])

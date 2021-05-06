@@ -8,8 +8,9 @@
 @include "./use.ne"
 
 @{%
-import { lexer } from '.';
-import makeSyntaxTypes, { SyntaxType, extendNode, flatten, nth, nil, compose, drop } from './syntax';
+import { lexer } from './lexer';
+import { SyntaxType } from './types';
+import makeSyntaxTypes, { extendNode, flatten, nth, nil, compose, drop } from './syntax';
 
 const syntax = makeSyntaxTypes();
 const ll = lexer();

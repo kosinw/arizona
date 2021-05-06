@@ -2,33 +2,26 @@
 
 exports[`parser tests can parse a very complex program 1`] = `
 Object {
-  "meta": Object {},
   "params": Array [
     Object {
-      "meta": Object {},
       "params": Array [
         Object {
-          "meta": Object {},
           "params": Array [
             Object {
-              "meta": Object {},
               "params": Array [],
               "staticType": null,
               "type": "Identifier",
               "value": "setPixel",
             },
             Object {
-              "meta": Object {},
               "params": Array [
                 Object {
-                  "meta": Object {},
                   "params": Array [],
                   "staticType": "i32",
                   "type": "Type",
                   "value": "i32",
                 },
                 Object {
-                  "meta": Object {},
                   "params": Array [],
                   "staticType": "i32",
                   "type": "Type",
@@ -40,10 +33,8 @@ Object {
               "value": "",
             },
             Object {
-              "meta": Object {},
               "params": Array [
                 Object {
-                  "meta": Object {},
                   "params": Array [],
                   "staticType": "f32",
                   "type": "Type",
@@ -60,7 +51,6 @@ Object {
           "value": "setPixel",
         },
         Object {
-          "meta": Object {},
           "params": Array [],
           "staticType": "i32",
           "type": "StringLiteral",
@@ -72,10 +62,8 @@ Object {
       "value": "",
     },
     Object {
-      "meta": Object {},
       "params": Array [
         Object {
-          "meta": Object {},
           "params": Array [],
           "staticType": "i32",
           "type": "IntegerLiteral",
@@ -87,33 +75,26 @@ Object {
       "value": "i",
     },
     Object {
-      "meta": Object {},
       "params": Array [
         Object {
-          "meta": Object {},
           "params": Array [
             Object {
-              "meta": Object {},
               "params": Array [],
               "staticType": null,
               "type": "Identifier",
               "value": "echo",
             },
             Object {
-              "meta": Object {},
               "params": Array [
                 Object {
-                  "meta": Object {},
                   "params": Array [
                     Object {
-                      "meta": Object {},
                       "params": Array [],
                       "staticType": null,
                       "type": "Identifier",
                       "value": "a",
                     },
                     Object {
-                      "meta": Object {},
                       "params": Array [],
                       "staticType": "i32",
                       "type": "DeclType",
@@ -125,17 +106,14 @@ Object {
                   "value": "",
                 },
                 Object {
-                  "meta": Object {},
                   "params": Array [
                     Object {
-                      "meta": Object {},
                       "params": Array [],
                       "staticType": null,
                       "type": "Identifier",
                       "value": "c",
                     },
                     Object {
-                      "meta": Object {},
                       "params": Array [],
                       "staticType": "f64",
                       "type": "DeclType",
@@ -152,10 +130,8 @@ Object {
               "value": "",
             },
             Object {
-              "meta": Object {},
               "params": Array [
                 Object {
-                  "meta": Object {},
                   "params": Array [],
                   "staticType": "i32",
                   "type": "Type",
@@ -167,33 +143,26 @@ Object {
               "value": "",
             },
             Object {
-              "meta": Object {},
               "params": Array [
                 Object {
-                  "meta": Object {},
                   "params": Array [
                     Object {
-                      "meta": Object {},
                       "params": Array [],
                       "staticType": null,
                       "type": "Noop",
                       "value": "",
                     },
                     Object {
-                      "meta": Object {},
                       "params": Array [],
                       "staticType": "bool",
                       "type": "BoolLiteral",
                       "value": true,
                     },
                     Object {
-                      "meta": Object {},
                       "params": Array [
                         Object {
-                          "meta": Object {},
                           "params": Array [
                             Object {
-                              "meta": Object {},
                               "params": Array [],
                               "staticType": "i32",
                               "type": "IntegerLiteral",
@@ -205,10 +174,8 @@ Object {
                           "value": "j",
                         },
                         Object {
-                          "meta": Object {},
                           "params": Array [
                             Object {
-                              "meta": Object {},
                               "params": Array [],
                               "staticType": "f32",
                               "type": "FloatLiteral",
@@ -220,10 +187,8 @@ Object {
                           "value": "k",
                         },
                         Object {
-                          "meta": Object {},
                           "params": Array [
                             Object {
-                              "meta": Object {},
                               "params": Array [],
                               "staticType": "i32",
                               "type": "IntegerLiteral",
@@ -235,14 +200,12 @@ Object {
                           "value": "l",
                         },
                         Object {
-                          "meta": Object {},
                           "params": Array [],
                           "staticType": null,
                           "type": "ContinueStatement",
                           "value": "",
                         },
                         Object {
-                          "meta": Object {},
                           "params": Array [],
                           "staticType": null,
                           "type": "BreakStatement",
@@ -259,23 +222,18 @@ Object {
                   "value": "",
                 },
                 Object {
-                  "meta": Object {},
                   "params": Array [
                     Object {
-                      "meta": Object {},
                       "params": Array [
                         Object {
-                          "meta": Object {},
                           "params": Array [
                             Object {
-                              "meta": Object {},
                               "params": Array [],
                               "staticType": "i32",
                               "type": "IntegerLiteral",
                               "value": 15,
                             },
                             Object {
-                              "meta": Object {},
                               "params": Array [],
                               "staticType": "i32",
                               "type": "IntegerLiteral",
@@ -287,17 +245,14 @@ Object {
                           "value": "^",
                         },
                         Object {
-                          "meta": Object {},
                           "params": Array [
                             Object {
-                              "meta": Object {},
                               "params": Array [],
                               "staticType": "i32",
                               "type": "IntegerLiteral",
                               "value": 3,
                             },
                             Object {
-                              "meta": Object {},
                               "params": Array [],
                               "staticType": "i32",
                               "type": "IntegerLiteral",

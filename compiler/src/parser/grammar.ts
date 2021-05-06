@@ -11,8 +11,9 @@ declare var string: any;
 declare var char: any;
 declare var bool: any;
 
-import { lexer } from '.';
-import makeSyntaxTypes, { SyntaxType, extendNode, flatten, nth, nil, compose, drop } from './syntax';
+import { lexer } from './lexer';
+import { SyntaxType } from './types';
+import makeSyntaxTypes, { extendNode, flatten, nth, nil, compose, drop } from './syntax';
 
 const syntax = makeSyntaxTypes();
 const ll = lexer();

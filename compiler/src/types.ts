@@ -1,7 +1,7 @@
-import * as syntax from './parser/syntax';
+import { Syn } from './parser/types';
 
 export interface CompileResult {
   text: string;
   buffer: Uint8Array;
-  ast: syntax.Syn;
+  ast: Syn;
 }

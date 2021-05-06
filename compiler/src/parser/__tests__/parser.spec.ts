@@ -1,11 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
-
-import grammar from '../grammar';
-import * as util from 'util';
 import dedent from 'dedent';
-import { Grammar, Parser } from 'nearley';
-
-const depthless = (d: any) => util.inspect(d, { depth: null });
+import { parse } from '..';
 
 describe('parser tests', () => {
   it('can parse a very complex program', () => {
@@ -27,10 +22,7 @@ describe('parser tests', () => {
       }
     `;
     
-    const parser = new Parser(Grammar.fromCompiled(grammar));
-    parser.feed(src);
-    const ast = parser.results[0];
-
+    const ast = parse(src);
     // expect(parser.results.length).toEqual(1);
     expect(ast).toMatchSnapshot();
   });
