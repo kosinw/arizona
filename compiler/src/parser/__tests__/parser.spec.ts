@@ -1,9 +1,9 @@
 import { describe, it, expect } from '@jest/globals';
 
 import grammar from '../grammar';
-import { parse } from '..';
 import * as util from 'util';
 import dedent from 'dedent';
+import { Grammar, Parser } from 'nearley';
 
 const depthless = (d: any) => util.inspect(d, { depth: null });
 
@@ -26,8 +26,10 @@ describe('parser tests', () => {
         return (15 ^ 18) << 3 * 99;
       }
     `;
-
-    const ast = parse(src);
+    
+    const parser = new Parser(Grammar.fromCompiled(grammar));
+    parser.feed(src);
+    const ast = parser.results[0];
 
     // expect(parser.results.length).toEqual(1);
     expect(ast).toMatchSnapshot();

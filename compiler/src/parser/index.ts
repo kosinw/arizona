@@ -17,7 +17,7 @@ export interface Lexer {
   readonly col: any;
 }
 
-export function lex(): Lexer {
+export function lexer(): Lexer {
   const mooLexer: any = moo.compile(tokens);
 
   return {

@@ -11,11 +11,11 @@ declare var string: any;
 declare var char: any;
 declare var bool: any;
 
-import { lex } from '.';
+import { lexer } from '.';
 import makeSyntaxTypes, { SyntaxType, extendNode, flatten, nth, nil, compose, drop } from './syntax';
 
-const lexer = lex();
 const syntax = makeSyntaxTypes();
+const ll = lexer();
 
 interface NearleyToken {
   value: any;
@@ -45,7 +45,7 @@ interface Grammar {
 };
 
 const grammar: Grammar = {
-  Lexer: lexer,
+  Lexer: ll,
   ParserRules: [
     {"name": "_$ebnf$1", "symbols": []},
     {"name": "_$ebnf$1", "symbols": ["_$ebnf$1", "wschar"], "postprocess": (d) => d[0].concat([d[1]])},
@@ -177,13 +177,13 @@ const grammar: Grammar = {
     {"name": "Atom", "symbols": ["FloatLiteral"], "postprocess": id},
     {"name": "Atom", "symbols": ["IntegerLiteral"], "postprocess": id},
     {"name": "Atom", "symbols": ["BoolLiteral"], "postprocess": id},
-    {"name": "NativeType", "symbols": [(lexer.has("type") ? {type: "type"} : type)], "postprocess": syntax.type},
-    {"name": "Identifier", "symbols": [(lexer.has("identifier") ? {type: "identifier"} : identifier)], "postprocess": syntax.identifier},
-    {"name": "FloatLiteral", "symbols": [(lexer.has("float") ? {type: "float"} : float)], "postprocess": syntax.float},
-    {"name": "IntegerLiteral", "symbols": [(lexer.has("integer") ? {type: "integer"} : integer)], "postprocess": syntax.integer},
-    {"name": "StringLiteral", "symbols": [(lexer.has("string") ? {type: "string"} : string)], "postprocess": syntax.string},
-    {"name": "CharLiteral", "symbols": [(lexer.has("char") ? {type: "char"} : char)], "postprocess": syntax.char},
-    {"name": "BoolLiteral", "symbols": [(lexer.has("bool") ? {type: "bool"} : bool)], "postprocess": syntax.bool},
+    {"name": "NativeType", "symbols": [(ll.has("type") ? {type: "type"} : type)], "postprocess": syntax.type},
+    {"name": "Identifier", "symbols": [(ll.has("identifier") ? {type: "identifier"} : identifier)], "postprocess": syntax.identifier},
+    {"name": "FloatLiteral", "symbols": [(ll.has("float") ? {type: "float"} : float)], "postprocess": syntax.float},
+    {"name": "IntegerLiteral", "symbols": [(ll.has("integer") ? {type: "integer"} : integer)], "postprocess": syntax.integer},
+    {"name": "StringLiteral", "symbols": [(ll.has("string") ? {type: "string"} : string)], "postprocess": syntax.string},
+    {"name": "CharLiteral", "symbols": [(ll.has("char") ? {type: "char"} : char)], "postprocess": syntax.char},
+    {"name": "BoolLiteral", "symbols": [(ll.has("bool") ? {type: "bool"} : bool)], "postprocess": syntax.bool},
     {"name": "LSB", "symbols": [{"literal":"["}], "postprocess": nil},
     {"name": "RSB", "symbols": [{"literal":"]"}], "postprocess": nil},
     {"name": "LP", "symbols": [{"literal":"("}], "postprocess": nil},

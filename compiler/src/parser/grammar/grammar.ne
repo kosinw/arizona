@@ -8,14 +8,14 @@
 @include "./use.ne"
 
 @{%
-import { lex } from '.';
+import { lexer } from '.';
 import makeSyntaxTypes, { SyntaxType, extendNode, flatten, nth, nil, compose, drop } from './syntax';
 
-const lexer = lex();
 const syntax = makeSyntaxTypes();
+const ll = lexer();
 %}
 
-@lexer lexer
+@lexer ll
 
 Program ->
       _                                 {% compose(syntax.node(SyntaxType.RootNode, { value: 'root' }), flatten) %}
