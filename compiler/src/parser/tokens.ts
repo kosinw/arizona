@@ -4,7 +4,7 @@ export const keywords = [
   'break',
   'if',
   'else',
-  'import',
+  'use',
   'from',
   'export',
   'return',
@@ -71,10 +71,10 @@ export const tokens: moo.Rules = {
   ],
   float: { match: /-?[0-9]+\.[0-9]*/ },
   integer: [
-    { match: /-?(?:[1-9][0-9_]*|0)/ },
     { match: /-?0[xX][0-9a-fA-F_]+/ },
     { match: /-?0[oO][0-7_]+/ },
     { match: /-?0[bB][01_]+/ },
+    { match: /-?(?:[1-9][0-9_]*|0)/ },
   ],
   char: [
     { match: /'(?:\\['\\bnfrtv0]|[^'\\\n])'/, value: (x) => x.slice(1, -1) },

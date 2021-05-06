@@ -36,6 +36,11 @@
         "signature": "e21c071ca3e1b4a815d5f04a7475adcaeea5d64367e840dd0154096d705c3940",
         "affectsGlobalScope": false
       },
+      "../node_modules/typescript/lib/lib.esnext.d.ts": {
+        "version": "fc7a21dd3ee27fd0a9ff1c46534efcd9c3cec51a445b479bb326d871c0aa8302",
+        "signature": "fc7a21dd3ee27fd0a9ff1c46534efcd9c3cec51a445b479bb326d871c0aa8302",
+        "affectsGlobalScope": false
+      },
       "../node_modules/typescript/lib/lib.es2015.core.d.ts": {
         "version": "46ee15e9fefa913333b61eaf6b18885900b139867d89832a515059b62cf16a17",
         "signature": "46ee15e9fefa913333b61eaf6b18885900b139867d89832a515059b62cf16a17",
@@ -191,19 +196,94 @@
         "signature": "506b80b9951c9381dc5f11897b31fca5e2a65731d96ddefa19687fbc26b23c6e",
         "affectsGlobalScope": true
       },
+      "../node_modules/typescript/lib/lib.esnext.string.d.ts": {
+        "version": "fb4416144c1bf0323ccbc9afb0ab289c07312214e8820ad17d709498c865a3fe",
+        "signature": "fb4416144c1bf0323ccbc9afb0ab289c07312214e8820ad17d709498c865a3fe",
+        "affectsGlobalScope": true
+      },
+      "../node_modules/typescript/lib/lib.esnext.promise.d.ts": {
+        "version": "cd6efb9467a8b6338ece2e2855e37765700f2cd061ca54b01b33878cf5c7677e",
+        "signature": "cd6efb9467a8b6338ece2e2855e37765700f2cd061ca54b01b33878cf5c7677e",
+        "affectsGlobalScope": true
+      },
+      "../node_modules/typescript/lib/lib.esnext.weakref.d.ts": {
+        "version": "1e61418f41d404e744b6536af9f8c6f6674dd4d54c12335cd0c4f7eded69cf3f",
+        "signature": "1e61418f41d404e744b6536af9f8c6f6674dd4d54c12335cd0c4f7eded69cf3f",
+        "affectsGlobalScope": true
+      },
       "../node_modules/@types/invariant/index.d.ts": {
         "version": "6acf8a984c2728906edeba2098c5c51f44a4520bc4a48c65b973bd785537178f",
         "signature": "6acf8a984c2728906edeba2098c5c51f44a4520bc4a48c65b973bd785537178f",
         "affectsGlobalScope": false
       },
+      "../node_modules/@types/line-column/index.d.ts": {
+        "version": "a27e3ae43a5f47e33ea468801b0cd8070a6958ce70368e093b4418525534fc47",
+        "signature": "a27e3ae43a5f47e33ea468801b0cd8070a6958ce70368e093b4418525534fc47",
+        "affectsGlobalScope": false
+      },
       "./src/common/source.ts": {
-        "version": "688a66b0c119676610121aed0fb77e75102ef36421663386565b4f582ba32333",
-        "signature": "a26d25980bf50228aeb5545765b4d94f8e540e0c2016e0d16c336e14f8063ca0",
+        "version": "9401e2fddb18a0708943d28b89d03fe1ecf7b95125ae6553d956ffdfa4954405",
+        "signature": "850aaf366f2763c98e5b656b2650efc5ced2032b9b2c780f8f332d17bde314eb",
         "affectsGlobalScope": false
       },
       "./src/index.ts": {
         "version": "cbff2bd390eadadfb95f6ff967f181a0d2ac4a468edbd0050cc4a54c1864513d",
         "signature": "17487d3a847605ba13b0fa4c8825e8c63b060aa06a60d323dfec974800cee6b6",
+        "affectsGlobalScope": false
+      },
+      "./src/codegen/index.ts": {
+        "version": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "signature": "3835f8d92ad0699690cf572ad0da8aa3bfa5cc1c66fbd2609c52a02b9da828dc",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/chalk/index.d.ts": {
+        "version": "0d14fa22c41fdc7277e6f71473b20ebc07f40f00e38875142335d5b63cdfc9d2",
+        "signature": "0d14fa22c41fdc7277e6f71473b20ebc07f40f00e38875142335d5b63cdfc9d2",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/word-wrap/index.d.ts": {
+        "version": "bee88252e17974d949e0dafa36a7b5e8e7cc9dc94d6e0eee2c7c11bafb2b478d",
+        "signature": "bee88252e17974d949e0dafa36a7b5e8e7cc9dc94d6e0eee2c7c11bafb2b478d",
+        "affectsGlobalScope": false
+      },
+      "./src/diagnostics/index.ts": {
+        "version": "8e6c1f7df3dd2876da592b4a429dc28670523b4ef9804fbd92940571b614c5f3",
+        "signature": "739dc1371615af571589c43563504075d86784b9031f02fe459de6d033d4b8bc",
+        "affectsGlobalScope": false
+      },
+      "./src/diagnostics/generated.ts": {
+        "version": "7b2891c5236559e0e67d27c35e8f30f7a24903e670080f5cc79b0e0a25e24845",
+        "signature": "94e51c232aa3baeec34bdcef7c3748f25d7c90699eb843414a3cb20cedf47329",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@types/moo/index.d.ts": {
+        "version": "8d2719a00fd506e100370ceadbc0d0760eae0a5b4bc417c8144d7857f6c6c743",
+        "signature": "8d2719a00fd506e100370ceadbc0d0760eae0a5b4bc417c8144d7857f6c6c743",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@types/nearley/index.d.ts": {
+        "version": "6022cdc31558179dbf355158c97179bad7993ff007f756bc5837d2e634950faf",
+        "signature": "6022cdc31558179dbf355158c97179bad7993ff007f756bc5837d2e634950faf",
+        "affectsGlobalScope": false
+      },
+      "./src/parser/tokens.ts": {
+        "version": "1fa0c3bda45aa3e44cb3805404377b1913090210cc6d31f172607a5cf957fbed",
+        "signature": "7b2056b0f1bd02ebc9afee0078af723c181d1be76d587305a4ff6e6b7fb983da",
+        "affectsGlobalScope": false
+      },
+      "./src/parser/syntax.ts": {
+        "version": "7df704c310af3ff6ae3a52335033c955fc798011fb31d8ee09276b7bf20271a0",
+        "signature": "75eba4b90c905b5e0cfda9446f682e8e8606a3e3520902b184fa836552755815",
+        "affectsGlobalScope": false
+      },
+      "./src/parser/index.ts": {
+        "version": "72784449ef8b902f3256372ded9ea3aee9212735023e7d630120e1e58973e8dd",
+        "signature": "6de465cd44602492509c5387d4af0283a7b9783332605ced987815c6127af865",
+        "affectsGlobalScope": false
+      },
+      "./src/parser/grammar.ts": {
+        "version": "f6b8e237480239424fe4e09763e0400b8021fd2b7aa3bf25aa173203d25d97a8",
+        "signature": "cf05fe68530c1306d8c50f24101a5e25d54d0e41b2066ee8596cc9571dfb1027",
         "affectsGlobalScope": false
       },
       "../node_modules/@babel/types/lib/index.d.ts": {
@@ -561,16 +641,6 @@
         "signature": "96d14f21b7652903852eef49379d04dbda28c16ed36468f8c9fa08f7c14c9538",
         "affectsGlobalScope": false
       },
-      "../node_modules/@types/moo/index.d.ts": {
-        "version": "8d2719a00fd506e100370ceadbc0d0760eae0a5b4bc417c8144d7857f6c6c743",
-        "signature": "8d2719a00fd506e100370ceadbc0d0760eae0a5b4bc417c8144d7857f6c6c743",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/@types/nearley/index.d.ts": {
-        "version": "6022cdc31558179dbf355158c97179bad7993ff007f756bc5837d2e634950faf",
-        "signature": "6022cdc31558179dbf355158c97179bad7993ff007f756bc5837d2e634950faf",
-        "affectsGlobalScope": false
-      },
       "../node_modules/@types/normalize-package-data/index.d.ts": {
         "version": "c9ad058b2cc9ce6dc2ed92960d6d009e8c04bef46d3f5312283debca6869f613",
         "signature": "c9ad058b2cc9ce6dc2ed92960d6d009e8c04bef46d3f5312283debca6869f613",
@@ -599,7 +669,7 @@
     },
     "options": {
       "lib": [
-        "lib.es2020.d.ts"
+        "lib.esnext.d.ts"
       ],
       "module": 1,
       "target": 7,
@@ -612,14 +682,43 @@
       "composite": true,
       "outDir": "./dist",
       "rootDir": "./src",
+      "resolveJsonModule": true,
+      "noImplicitAny": false,
       "configFilePath": "./tsconfig.json"
     },
     "referencedMap": {
       "./src/common/source.ts": [
-        "../node_modules/@types/invariant/index.d.ts"
+        "../node_modules/@types/invariant/index.d.ts",
+        "../node_modules/@types/line-column/index.d.ts"
+      ],
+      "./src/diagnostics/generated.ts": [
+        "./src/diagnostics/index.ts"
+      ],
+      "./src/diagnostics/index.ts": [
+        "../node_modules/@types/invariant/index.d.ts",
+        "../node_modules/chalk/index.d.ts",
+        "../node_modules/word-wrap/index.d.ts",
+        "./src/common/source.ts",
+        "./src/diagnostics/generated.ts"
       ],
       "./src/index.ts": [
         "./src/common/source.ts"
+      ],
+      "./src/parser/grammar.ts": [
+        "../node_modules/@types/moo/index.d.ts",
+        "./src/parser/index.ts",
+        "./src/parser/syntax.ts"
+      ],
+      "./src/parser/index.ts": [
+        "../node_modules/@types/invariant/index.d.ts",
+        "../node_modules/@types/moo/index.d.ts",
+        "../node_modules/@types/nearley/index.d.ts",
+        "./src/parser/grammar.ts",
+        "./src/parser/syntax.ts",
+        "./src/parser/tokens.ts"
+      ],
+      "./src/parser/tokens.ts": [
+        "../node_modules/@types/moo/index.d.ts"
       ],
       "../node_modules/@babel/parser/typings/babel-parser.d.ts": [
         "../node_modules/@babel/types/lib/index.d.ts"
@@ -926,6 +1025,19 @@
       ]
     },
     "exportedModulesMap": {
+      "./src/diagnostics/generated.ts": [
+        "./src/diagnostics/index.ts"
+      ],
+      "./src/diagnostics/index.ts": [
+        "./src/common/source.ts",
+        "./src/diagnostics/generated.ts"
+      ],
+      "./src/parser/index.ts": [
+        "./src/parser/syntax.ts"
+      ],
+      "./src/parser/tokens.ts": [
+        "../node_modules/@types/moo/index.d.ts"
+      ],
       "../node_modules/@babel/parser/typings/babel-parser.d.ts": [
         "../node_modules/@babel/types/lib/index.d.ts"
       ],
@@ -1231,8 +1343,15 @@
       ]
     },
     "semanticDiagnosticsPerFile": [
+      "./src/codegen/index.ts",
       "./src/common/source.ts",
+      "./src/diagnostics/generated.ts",
+      "./src/diagnostics/index.ts",
       "./src/index.ts",
+      "./src/parser/grammar.ts",
+      "./src/parser/index.ts",
+      "./src/parser/syntax.ts",
+      "./src/parser/tokens.ts",
       "../node_modules/@babel/parser/typings/babel-parser.d.ts",
       "../node_modules/@babel/types/lib/index.d.ts",
       "../node_modules/@types/babel__core/index.d.ts",
@@ -1248,6 +1367,7 @@
       "../node_modules/@types/jest/index.d.ts",
       "../node_modules/@types/json-schema/index.d.ts",
       "../node_modules/@types/json5/index.d.ts",
+      "../node_modules/@types/line-column/index.d.ts",
       "../node_modules/@types/moo/index.d.ts",
       "../node_modules/@types/nearley/index.d.ts",
       "../node_modules/@types/node/assert.d.ts",
@@ -1305,6 +1425,7 @@
       "../node_modules/@types/stack-utils/index.d.ts",
       "../node_modules/@types/yargs-parser/index.d.ts",
       "../node_modules/@types/yargs/index.d.ts",
+      "../node_modules/chalk/index.d.ts",
       "../node_modules/jest-diff/build/cleanupsemantic.d.ts",
       "../node_modules/jest-diff/build/difflines.d.ts",
       "../node_modules/jest-diff/build/index.d.ts",
@@ -1349,7 +1470,12 @@
       "../node_modules/typescript/lib/lib.es2020.string.d.ts",
       "../node_modules/typescript/lib/lib.es2020.symbol.wellknown.d.ts",
       "../node_modules/typescript/lib/lib.es5.d.ts",
-      "../node_modules/typescript/lib/lib.esnext.intl.d.ts"
+      "../node_modules/typescript/lib/lib.esnext.d.ts",
+      "../node_modules/typescript/lib/lib.esnext.intl.d.ts",
+      "../node_modules/typescript/lib/lib.esnext.promise.d.ts",
+      "../node_modules/typescript/lib/lib.esnext.string.d.ts",
+      "../node_modules/typescript/lib/lib.esnext.weakref.d.ts",
+      "../node_modules/word-wrap/index.d.ts"
     ]
   },
   "version": "4.2.4"

@@ -1,29 +1,17 @@
-import { SourceFile } from "./common/source";
+import * as syntax from './parser/syntax';
 
-// TODO(kosi): Add field for syntax tree.
 export interface CompileResult {
   text: string;
   buffer: Uint8Array;
-}
-
-// TODO(kosi): Add linker stuff here.
-export interface CompileOptions {
-  filename: string;
+  ast: syntax.Syn;
 }
 
 // TODO(kosi): Maybe pass in compile options?
 /**
  * Compiles an Arizona program into WebAssembly.
- * @param source 
- * @param options 
+ * @param source
+ * @param options
  */
-export function compile(
-  source: string,
-  options?: CompileOptions
-): CompileResult {
-  const { filename = 'unknown.az' } = options || {};
-
-   const file = new SourceFile(source, filename);
-
+export function compile(source: string): CompileResult {
   throw 'unimplemented';
 }

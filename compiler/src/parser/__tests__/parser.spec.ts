@@ -1,51 +1,35 @@
 import { describe, it, expect } from '@jest/globals';
 
 import grammar from '../grammar';
-import { Parser, Grammar } from 'nearley';
+import { parse } from '..';
 import * as util from 'util';
+import dedent from 'dedent';
 
 const depthless = (d: any) => util.inspect(d, { depth: null });
 
 describe('parser tests', () => {
-  it('basic parsing (arithmetic expressions)', () => {
-    const src = `a = (1 + 3 - 4 * 18 ^ 2) == (8 / 2 % 13);`;
+  it('can parse a very complex program', () => {
+    const src = dedent`
+      use fn setPixel(i32, i32) -> f32 from "env";
 
-    const parser = new Parser(Grammar.fromCompiled(grammar));
+      let i: i32 = 15;
 
-    parser.feed(src);
+      export fn echo(a: i32, c: f64) -> i32 {
+        while true {
+          let j: i32 = 16;
+          let k: f64 = 1.23456;
+          let l: i32 = 0x3a;
+          continue;
+          break;
+        }
 
-    expect(parser.results).toMatchSnapshot();
-  });
+        return (15 ^ 18) << 3 * 99;
+      }
+    `;
 
-  it('more parsing (assignments statements)', () => {
-    const src1 = `a += 15;`;
-    const src2 = `a = 23;`;
-    const src3 = `a -= 15;`;
+    const ast = parse(src);
 
-    let parser = new Parser(Grammar.fromCompiled(grammar));
-
-    parser.feed(src1);
-    expect(parser.results).toMatchSnapshot();
-
-    parser = new Parser(Grammar.fromCompiled(grammar));
-
-    parser.feed(src2);
-    expect(parser.results).toMatchSnapshot();
-
-    parser = new Parser(Grammar.fromCompiled(grammar));
-
-    parser.feed(src3);
-    expect(parser.results).toMatchSnapshot();
-  });
-
-  it('even more parsing (statements)', () => {
-    const src = `return    ;`;
-
-    const parser = new Parser(Grammar.fromCompiled(grammar));
-
-    parser.feed(src);
-
-    console.log(parser.results.length);
-    console.log(depthless(parser.results));
+    // expect(parser.results.length).toEqual(1);
+    expect(ast).toMatchSnapshot();
   });
 });

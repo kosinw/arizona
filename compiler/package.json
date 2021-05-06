@@ -10,7 +10,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "gen:diagnostics": "ts-node scripts/generate-diagnostics.ts",
-    "grammar": "nearleyc -o src/parser/grammar.ts src/parser/grammar.ne"
+    "grammar": "nearleyc -o src/parser/grammar.ts src/parser/grammar/grammar.ne"
   },
   "repository": {
     "type": "git",

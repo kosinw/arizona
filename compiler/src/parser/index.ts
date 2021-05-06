@@ -1,5 +1,9 @@
 import * as moo from 'moo';
+import { Grammar, Parser } from 'nearley';
 import { tokens } from './tokens';
+import grammar from './grammar';
+import invariant from 'invariant';
+import * as syntax from './syntax';
 
 export interface Lexer {
   save(): any;
@@ -13,7 +17,7 @@ export interface Lexer {
   readonly col: any;
 }
 
-export function makeLexer(): Lexer {
+export function lex(): Lexer {
   const mooLexer: any = moo.compile(tokens);
 
   return {
@@ -49,4 +53,16 @@ export function makeLexer(): Lexer {
       return mooLexer.has(name);
     },
   };
+}
+
+export function parse(source: string): syntax.Syn {
+  const parser = new Parser(Grammar.fromCompiled(grammar));
+  parser.feed(source);
+
+  invariant(
+    parser.results.length === 1,
+    `Ambiguous syntax. Number of parser productions ${parser.results.length}.`
+  );
+
+  return parser.results[0];
 }

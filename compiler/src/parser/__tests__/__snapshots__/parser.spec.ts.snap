@@ -1,244 +1,341 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`parser tests basic parsing (arithmetic expressions) 1`] = `
-Array [
-  Object {
-    "meta": Object {},
-    "params": Array [
-      Object {
-        "meta": Object {},
-        "params": Array [],
-        "staticType": null,
-        "type": "Identifier",
-        "value": "a",
-      },
-      Object {
-        "meta": Object {},
-        "params": Array [
-          Object {
-            "meta": Object {},
-            "params": Array [
-              Object {
-                "meta": Object {},
-                "params": Array [
-                  Object {
-                    "meta": Object {},
-                    "params": Array [
-                      Object {
-                        "meta": Object {},
-                        "params": Array [],
-                        "staticType": "i32",
-                        "type": "IntegerLiteral",
-                        "value": 1,
-                      },
-                      Object {
-                        "meta": Object {},
-                        "params": Array [],
-                        "staticType": "i32",
-                        "type": "IntegerLiteral",
-                        "value": 3,
-                      },
-                    ],
-                    "staticType": null,
-                    "type": "BinaryExpression",
-                    "value": "+",
-                  },
-                  Object {
-                    "meta": Object {},
-                    "params": Array [
-                      Object {
-                        "meta": Object {},
-                        "params": Array [],
-                        "staticType": "i32",
-                        "type": "IntegerLiteral",
-                        "value": 4,
-                      },
-                      Object {
-                        "meta": Object {},
-                        "params": Array [],
-                        "staticType": "i32",
-                        "type": "IntegerLiteral",
-                        "value": 18,
-                      },
-                    ],
-                    "staticType": null,
-                    "type": "BinaryExpression",
-                    "value": "*",
-                  },
-                ],
-                "staticType": null,
-                "type": "BinaryExpression",
-                "value": "-",
-              },
-              Object {
-                "meta": Object {},
-                "params": Array [],
-                "staticType": "i32",
-                "type": "IntegerLiteral",
-                "value": 2,
-              },
-            ],
-            "staticType": null,
-            "type": "BinaryExpression",
-            "value": "^",
-          },
-          Object {
-            "meta": Object {},
-            "params": Array [
-              Object {
-                "meta": Object {},
-                "params": Array [
-                  Object {
-                    "meta": Object {},
-                    "params": Array [],
-                    "staticType": "i32",
-                    "type": "IntegerLiteral",
-                    "value": 8,
-                  },
-                  Object {
-                    "meta": Object {},
-                    "params": Array [],
-                    "staticType": "i32",
-                    "type": "IntegerLiteral",
-                    "value": 2,
-                  },
-                ],
-                "staticType": null,
-                "type": "BinaryExpression",
-                "value": "/",
-              },
-              Object {
-                "meta": Object {},
-                "params": Array [],
-                "staticType": "i32",
-                "type": "IntegerLiteral",
-                "value": 13,
-              },
-            ],
-            "staticType": null,
-            "type": "BinaryExpression",
-            "value": "%",
-          },
-        ],
-        "staticType": null,
-        "type": "BinaryExpression",
-        "value": "==",
-      },
-    ],
-    "staticType": null,
-    "type": "AssignmentStatement",
-    "value": "=",
-  },
-]
-`;
-
-exports[`parser tests more parsing (assignments statements) 1`] = `
-Array [
-  Object {
-    "meta": Object {},
-    "params": Array [
-      Object {
-        "meta": Object {},
-        "params": Array [],
-        "staticType": null,
-        "type": "Identifier",
-        "value": "a",
-      },
-      Object {
-        "meta": Object {},
-        "params": Array [
-          Object {
-            "meta": Object {},
-            "params": Array [],
-            "staticType": null,
-            "type": "Identifier",
-            "value": "a",
-          },
-          Object {
-            "meta": Object {},
-            "params": Array [],
-            "staticType": "i32",
-            "type": "IntegerLiteral",
-            "value": 15,
-          },
-        ],
-        "staticType": null,
-        "type": "BinaryExpression",
-        "value": "+",
-      },
-    ],
-    "staticType": null,
-    "type": "AssignmentStatement",
-    "value": "=",
-  },
-]
-`;
-
-exports[`parser tests more parsing (assignments statements) 2`] = `
-Array [
-  Object {
-    "meta": Object {},
-    "params": Array [
-      Object {
-        "meta": Object {},
-        "params": Array [],
-        "staticType": null,
-        "type": "Identifier",
-        "value": "a",
-      },
-      Object {
-        "meta": Object {},
-        "params": Array [],
-        "staticType": "i32",
-        "type": "IntegerLiteral",
-        "value": 23,
-      },
-    ],
-    "staticType": null,
-    "type": "AssignmentStatement",
-    "value": "=",
-  },
-]
-`;
-
-exports[`parser tests more parsing (assignments statements) 3`] = `
-Array [
-  Object {
-    "meta": Object {},
-    "params": Array [
-      Object {
-        "meta": Object {},
-        "params": Array [],
-        "staticType": null,
-        "type": "Identifier",
-        "value": "a",
-      },
-      Object {
-        "meta": Object {},
-        "params": Array [
-          Object {
-            "meta": Object {},
-            "params": Array [],
-            "staticType": null,
-            "type": "Identifier",
-            "value": "a",
-          },
-          Object {
-            "meta": Object {},
-            "params": Array [],
-            "staticType": "i32",
-            "type": "IntegerLiteral",
-            "value": 15,
-          },
-        ],
-        "staticType": null,
-        "type": "BinaryExpression",
-        "value": "-",
-      },
-    ],
-    "staticType": null,
-    "type": "AssignmentStatement",
-    "value": "=",
-  },
-]
+exports[`parser tests can parse a very complex program 1`] = `
+Object {
+  "meta": Object {},
+  "params": Array [
+    Object {
+      "meta": Object {},
+      "params": Array [
+        Object {
+          "meta": Object {},
+          "params": Array [
+            Object {
+              "meta": Object {},
+              "params": Array [],
+              "staticType": null,
+              "type": "Identifier",
+              "value": "setPixel",
+            },
+            Object {
+              "meta": Object {},
+              "params": Array [
+                Object {
+                  "meta": Object {},
+                  "params": Array [],
+                  "staticType": "i32",
+                  "type": "Type",
+                  "value": "i32",
+                },
+                Object {
+                  "meta": Object {},
+                  "params": Array [],
+                  "staticType": "i32",
+                  "type": "Type",
+                  "value": "i32",
+                },
+              ],
+              "staticType": null,
+              "type": "FunctionParameters",
+              "value": "",
+            },
+            Object {
+              "meta": Object {},
+              "params": Array [
+                Object {
+                  "meta": Object {},
+                  "params": Array [],
+                  "staticType": "f32",
+                  "type": "Type",
+                  "value": "f32",
+                },
+              ],
+              "staticType": "f32",
+              "type": "FunctionResult",
+              "value": "",
+            },
+          ],
+          "staticType": null,
+          "type": "FunctionHeaderDeclaration",
+          "value": "setPixel",
+        },
+        Object {
+          "meta": Object {},
+          "params": Array [],
+          "staticType": "i32",
+          "type": "StringLiteral",
+          "value": "env",
+        },
+      ],
+      "staticType": null,
+      "type": "UseFunctionDeclaration",
+      "value": "",
+    },
+    Object {
+      "meta": Object {},
+      "params": Array [
+        Object {
+          "meta": Object {},
+          "params": Array [],
+          "staticType": "i32",
+          "type": "IntegerLiteral",
+          "value": 15,
+        },
+      ],
+      "staticType": "i32",
+      "type": "GlobalVariableDeclaration",
+      "value": "i",
+    },
+    Object {
+      "meta": Object {},
+      "params": Array [
+        Object {
+          "meta": Object {},
+          "params": Array [
+            Object {
+              "meta": Object {},
+              "params": Array [],
+              "staticType": null,
+              "type": "Identifier",
+              "value": "echo",
+            },
+            Object {
+              "meta": Object {},
+              "params": Array [
+                Object {
+                  "meta": Object {},
+                  "params": Array [
+                    Object {
+                      "meta": Object {},
+                      "params": Array [],
+                      "staticType": null,
+                      "type": "Identifier",
+                      "value": "a",
+                    },
+                    Object {
+                      "meta": Object {},
+                      "params": Array [],
+                      "staticType": "i32",
+                      "type": "DeclType",
+                      "value": "i32",
+                    },
+                  ],
+                  "staticType": null,
+                  "type": "Pair",
+                  "value": "",
+                },
+                Object {
+                  "meta": Object {},
+                  "params": Array [
+                    Object {
+                      "meta": Object {},
+                      "params": Array [],
+                      "staticType": null,
+                      "type": "Identifier",
+                      "value": "c",
+                    },
+                    Object {
+                      "meta": Object {},
+                      "params": Array [],
+                      "staticType": "f64",
+                      "type": "DeclType",
+                      "value": "f64",
+                    },
+                  ],
+                  "staticType": null,
+                  "type": "Pair",
+                  "value": "",
+                },
+              ],
+              "staticType": null,
+              "type": "FunctionParameters",
+              "value": "",
+            },
+            Object {
+              "meta": Object {},
+              "params": Array [
+                Object {
+                  "meta": Object {},
+                  "params": Array [],
+                  "staticType": "i32",
+                  "type": "Type",
+                  "value": "i32",
+                },
+              ],
+              "staticType": "i32",
+              "type": "FunctionResult",
+              "value": "",
+            },
+            Object {
+              "meta": Object {},
+              "params": Array [
+                Object {
+                  "meta": Object {},
+                  "params": Array [
+                    Object {
+                      "meta": Object {},
+                      "params": Array [],
+                      "staticType": null,
+                      "type": "Noop",
+                      "value": "",
+                    },
+                    Object {
+                      "meta": Object {},
+                      "params": Array [],
+                      "staticType": "bool",
+                      "type": "BoolLiteral",
+                      "value": true,
+                    },
+                    Object {
+                      "meta": Object {},
+                      "params": Array [
+                        Object {
+                          "meta": Object {},
+                          "params": Array [
+                            Object {
+                              "meta": Object {},
+                              "params": Array [],
+                              "staticType": "i32",
+                              "type": "IntegerLiteral",
+                              "value": 16,
+                            },
+                          ],
+                          "staticType": "i32",
+                          "type": "VariableDeclaration",
+                          "value": "j",
+                        },
+                        Object {
+                          "meta": Object {},
+                          "params": Array [
+                            Object {
+                              "meta": Object {},
+                              "params": Array [],
+                              "staticType": "f32",
+                              "type": "FloatLiteral",
+                              "value": 1.23456,
+                            },
+                          ],
+                          "staticType": "f64",
+                          "type": "VariableDeclaration",
+                          "value": "k",
+                        },
+                        Object {
+                          "meta": Object {},
+                          "params": Array [
+                            Object {
+                              "meta": Object {},
+                              "params": Array [],
+                              "staticType": "i32",
+                              "type": "IntegerLiteral",
+                              "value": 58,
+                            },
+                          ],
+                          "staticType": "i32",
+                          "type": "VariableDeclaration",
+                          "value": "l",
+                        },
+                        Object {
+                          "meta": Object {},
+                          "params": Array [],
+                          "staticType": null,
+                          "type": "ContinueStatement",
+                          "value": "",
+                        },
+                        Object {
+                          "meta": Object {},
+                          "params": Array [],
+                          "staticType": null,
+                          "type": "BreakStatement",
+                          "value": "",
+                        },
+                      ],
+                      "staticType": null,
+                      "type": "Block",
+                      "value": "",
+                    },
+                  ],
+                  "staticType": null,
+                  "type": "LoopStatement",
+                  "value": "",
+                },
+                Object {
+                  "meta": Object {},
+                  "params": Array [
+                    Object {
+                      "meta": Object {},
+                      "params": Array [
+                        Object {
+                          "meta": Object {},
+                          "params": Array [
+                            Object {
+                              "meta": Object {},
+                              "params": Array [],
+                              "staticType": "i32",
+                              "type": "IntegerLiteral",
+                              "value": 15,
+                            },
+                            Object {
+                              "meta": Object {},
+                              "params": Array [],
+                              "staticType": "i32",
+                              "type": "IntegerLiteral",
+                              "value": 18,
+                            },
+                          ],
+                          "staticType": null,
+                          "type": "BinaryExpression",
+                          "value": "^",
+                        },
+                        Object {
+                          "meta": Object {},
+                          "params": Array [
+                            Object {
+                              "meta": Object {},
+                              "params": Array [],
+                              "staticType": "i32",
+                              "type": "IntegerLiteral",
+                              "value": 3,
+                            },
+                            Object {
+                              "meta": Object {},
+                              "params": Array [],
+                              "staticType": "i32",
+                              "type": "IntegerLiteral",
+                              "value": 99,
+                            },
+                          ],
+                          "staticType": null,
+                          "type": "BinaryExpression",
+                          "value": "*",
+                        },
+                      ],
+                      "staticType": null,
+                      "type": "BinaryExpression",
+                      "value": "<<",
+                    },
+                  ],
+                  "staticType": null,
+                  "type": "ReturnStatement",
+                  "value": "",
+                },
+              ],
+              "staticType": null,
+              "type": "Block",
+              "value": "",
+            },
+          ],
+          "staticType": null,
+          "type": "FunctionDeclaration",
+          "value": "echo",
+        },
+      ],
+      "staticType": null,
+      "type": "Export",
+      "value": "export",
+    },
+  ],
+  "staticType": null,
+  "type": "RootNode",
+  "value": "root",
+}
 `;

@@ -2,6 +2,7 @@ import curry from 'curry';
 
 export enum SyntaxType {
   Type = 'Type',
+  DeclType = 'DeclType',
   Identifier = 'Identifier',
   IntegerLiteral = 'IntegerLiteral',
   FloatLiteral = 'FloatLiteral',
@@ -15,6 +16,25 @@ export enum SyntaxType {
   BinaryExpression = 'BinaryExpression',
   AssignmentStatement = 'AssignmentStatement',
   ReturnStatement = 'ReturnStatement',
+  ImmutableDeclaration = 'ImmutableDeclaration',
+  VariableDeclaration = 'VariableDeclaration',
+  GlobalImmutableDeclaration = 'GlobalImmutableDeclaration',
+  GlobalVariableDeclaration = 'GlobalVariableDeclaration',
+  Pair = 'Pair',
+  RootNode = 'RootNode',
+  FunctionResult = 'FunctionResult',
+  FunctionDeclaration = 'FunctionDeclaration',
+  FunctionParameters = 'FunctionParameters',
+  Block = 'Block',
+  Export = 'Export',
+  IfStatement = 'IfStatement',
+  ElseStatement = 'ElseStatement',
+  LoopStatement = 'LoopStatement',
+  BreakStatement = 'BreakStatement',
+  ContinueStatement = 'ContinueStatement',
+  Noop = 'Noop',
+  UseFunctionDeclaration = 'UseFunctionDeclaration',
+  FunctionHeaderDeclaration = 'FunctionHeaderDeclaration',
 }
 
 export interface Syn {
@@ -46,20 +66,22 @@ export const drop = (d): Syn[] => {
 
 export const add = (d) => `${d[0]}${d[1]}`;
 
-const extendNode = curry(({ meta, ...options }: any, node: { meta: any }) => {
-  return {
-    ...node,
-    meta: { ...node.meta, ...meta },
-    ...options,
-  };
-});
+export const extendNode = curry(
+  ({ meta, ...options }: any, node: { meta: any }) => {
+    return {
+      ...node,
+      meta: { ...node.meta, ...meta },
+      ...options,
+    };
+  }
+);
 
 export const compose = (...fns: any) =>
   fns.reduce((f: any, g: any) => (...args: any[]) => f(g(...args)));
 
 export default function factory() {
   const node = (type: SyntaxType, seed: any = {}) => (d: Syn[]): Syn => {
-    const params = d.filter(nonEmpty);
+    const params = drop(d);
     const { value = '', meta = {} } = seed;
 
     return {
@@ -167,13 +189,14 @@ export default function factory() {
     );
   };
 
-  const unary = ([opeartor, target]) => {
+  const unary = (d) => {
+    const [operator, target] = drop(d);
     return extendNode(
       {
-        value: opeartor.value,
+        value: operator.value,
         params: [target],
       },
-      node(SyntaxType.UnaryExpression)([opeartor, target])
+      node(SyntaxType.UnaryExpression)([operator, target])
     );
   };
 
@@ -199,8 +222,89 @@ export default function factory() {
     return node(SyntaxType.AssignmentStatement, { value })([lhs, rhs]);
   };
 
+  const declaration = curry((type: SyntaxType, d) => {
+    const [pair, ...init] = drop(d);
+    const [id, staticType] = pair.params;
+
+    return extendNode(
+      { value: id.value, staticType: staticType.value },
+      node(type)(init)
+    );
+  });
+
   const return_ = (d) => {
     return node(SyntaxType.ReturnStatement)(d);
+  };
+
+  const voidfn = (d) => {
+    const params = drop(d);
+    const [name, args, block] = params;
+
+    const result = extendNode(
+      { staticType: null },
+      node(SyntaxType.FunctionResult)([])
+    );
+
+    return extendNode(
+      {
+        value: name.value,
+        params: [args, result, block],
+      },
+      node(SyntaxType.FunctionDeclaration)(params)
+    );
+  };
+
+  const fn = (d) => {
+    const params = drop(d);
+    const [name, _, result] = params;
+
+    if (result.value === 'void') {
+      return voidfn(d);
+    }
+
+    return extendNode(
+      {
+        value: name.value,
+      },
+      node(SyntaxType.FunctionDeclaration)(params)
+    );
+  };
+
+  const result = (d) => {
+    const [type] = drop(d);
+    return extendNode(
+      {
+        staticType: type.value,
+      },
+      node(SyntaxType.FunctionResult)(d)
+    );
+  };
+
+  const for_ = (d) => {
+    const [init, condition, afterthought, ...block] = drop(d);
+    return node(SyntaxType.LoopStatement)([
+      init,
+      condition,
+      ...block,
+      afterthought,
+    ]);
+  };
+
+  const while_ = (d) => {
+    const noop = node(SyntaxType.Noop)([]);
+    return node(SyntaxType.LoopStatement)([noop, ...d]);
+  };
+
+  const fnheader = (d) => {
+    const params = drop(d);
+    const [name] = params;
+
+    return extendNode(
+      {
+        value: name.value,
+      },
+      node(SyntaxType.FunctionHeaderDeclaration)(params)
+    );
   };
 
   return {
@@ -214,9 +318,17 @@ export default function factory() {
     access,
     subscript,
     assignment,
+    declaration,
     call,
     unary,
     binary,
+    node,
+    result,
+    voidfn,
+    fn,
+    fnheader,
     return: return_,
+    for: for_,
+    while: while_,
   };
 }
