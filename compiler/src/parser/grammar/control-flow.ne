@@ -7,10 +7,16 @@ ElseStatement ->
     | ELSE _ IfStatement                       {% syntax.node(SyntaxType.ElseStatement) %}
 
 ForStatement ->
-    FOR _ _Assignment TERMINATOR _ Expression TERMINATOR _ _Assignment _ Block
+      FOR _ _Assignment TERMINATOR _ Expression TERMINATOR _ _Assignment _ Block
+                                              {% syntax.for %}
+    | FOR _ LP _ _Assignment TERMINATOR _ Expression TERMINATOR _ _Assignment _ RP _ Block
+                                              {% syntax.for %}
+    | FOR _ VariableDeclaration _ Expression TERMINATOR _ _Assignment _ Block
+                                              {% syntax.for %}
+    | FOR _ LP _ VariableDeclaration _ Expression TERMINATOR _ _Assignment _ RP _ Block
                                               {% syntax.for %}
 
 WhileStatement -> WHILE _ Expression _ Block  {% syntax.while %}
 
-Break     -> BREAK TERMINATOR                     {% syntax.node(SyntaxType.BreakStatement) %}
+Break     -> BREAK TERMINATOR                  {% syntax.node(SyntaxType.BreakStatement) %}
 Continue  -> CONTINUE TERMINATOR               {% syntax.node(SyntaxType.ContinueStatement) %}

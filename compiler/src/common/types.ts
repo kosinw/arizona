@@ -1,7 +1,10 @@
-import { Syn, SyntaxType } from "../parser/types";
+import { SyntaxNode, SyntaxType } from '../parser/types';
 
-export type TraverseMapFunctor = (node: Syn, walk?: TraverseMapFunctor) => void; 
+export type TraverseMapFunctor = (
+  node: SyntaxNode,
+  walk?: (node: SyntaxNode) => SyntaxNode
+) => void;
 
 export type TraverseMap = {
-    [x in SyntaxType | '*']?: TraverseMapFunctor;
+  [x in SyntaxType | '*']?: TraverseMapFunctor;
 };

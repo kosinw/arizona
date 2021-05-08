@@ -19,8 +19,8 @@ const ll = lexer();
 @lexer ll
 
 Program ->
-      _                                 {% compose(syntax.node(SyntaxType.RootNode, { value: 'root' }), flatten) %}
-    | _ TopLevelDeclarations _          {% compose(syntax.node(SyntaxType.RootNode, { value: 'root' }), flatten) %}
+      _                                 {% compose(syntax.node(SyntaxType.RootNode), flatten) %}
+    | _ TopLevelDeclarations _          {% compose(syntax.node(SyntaxType.RootNode), flatten) %}
 
 TopLevelDeclarations ->
     TopLevelDeclaration                             {% flatten %}
@@ -34,9 +34,9 @@ TopLevelDeclaration ->
     | UseFunctionDeclaration                    {% id %}
 
 Export ->
-      EXPORT __ GlobalImmutableDeclaration            {% syntax.node(SyntaxType.Export, { value: 'export' }) %}
-    | EXPORT __ FunctionDeclaration                   {% syntax.node(SyntaxType.Export, { value: 'export' }) %}
-    | EXPORT __ GlobalVariableDeclaration             {% syntax.node(SyntaxType.Export, { value: 'export' }) %}
+      EXPORT __ GlobalImmutableDeclaration            {% syntax.node(SyntaxType.Export) %}
+    | EXPORT __ FunctionDeclaration                   {% syntax.node(SyntaxType.Export) %}
+    | EXPORT __ GlobalVariableDeclaration             {% syntax.node(SyntaxType.Export) %}
 
 Block ->
       LCB _ RCB                                   {% syntax.node(SyntaxType.Block) %}
@@ -51,8 +51,8 @@ FunctionDeclaration ->
     | FN __ Identifier _ FunctionParameters _ FunctionResult _ Block    {% syntax.fn %}
 
 FunctionHeaderDeclaration ->
-      FN __ Identifier _ TypeParameters                    {% syntax.fnheader %}
-    | FN __ Identifier _ TypeParameters _ FunctionResult   {% syntax.fnheader %}
+      FN __ Identifier _ FunctionParameters                    {% syntax.fnheader %}
+    | FN __ Identifier _ FunctionParameters _ FunctionResult   {% syntax.fnheader %}
 
 FunctionResult ->
     RARROW _ Type                                           {% compose(syntax.result, drop) %}
@@ -61,17 +61,9 @@ FunctionParameters ->
       LP _ RP                                               {% syntax.node(SyntaxType.FunctionParameters) %}
     | LP _ Parameters _ RP                                  {% compose(syntax.node(SyntaxType.FunctionParameters), flatten, flatten) %}
 
-TypeParameters ->
-      LP _ RP                                               {% syntax.node(SyntaxType.FunctionParameters) %}
-    | LP _ Types _ RP                                       {% compose(syntax.node(SyntaxType.FunctionParameters), flatten, flatten) %}
-
 Parameters ->
       NameAndType                                           {% id %}
     | NameAndType _ COMMA _ Parameters                      {% flatten %}
-
-Types ->
-      Type                                           {% id %}
-    | Type _ COMMA _ Types                           {% flatten %}
 
 AnonymousBlock ->
     Block                                                 {% id %}

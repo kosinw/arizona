@@ -1,9 +1,9 @@
 import { Grammar, Parser } from 'nearley';
 import grammar from './grammar';
 import invariant from 'invariant';
-import { Syn } from './types';
+import { SyntaxNode } from './types';
 
-export function parse(source: string): Syn {
+export function parse(source: string): SyntaxNode {
   const parser = new Parser(Grammar.fromCompiled(grammar));
   parser.feed(source);
 

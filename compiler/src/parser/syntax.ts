@@ -1,10 +1,11 @@
 import curry from 'curry';
-import { Syn, SyntaxType } from './types';
+import { SyntaxNode, SyntaxType, SyntaxNativeType } from './types';
 
-// TODO(kosi): Come back and fix all this type shit
-export const nil = (d) => null;
-export const nth = (n) => (d): Syn => d[n];
-export const flatten = (d) =>
+export const nil = (_d: SyntaxNode[]) => null;
+
+export const nth = (n: number) => (d: SyntaxNode[]): SyntaxNode => d[n];
+
+export const flatten = (d: SyntaxNode[][]) =>
   d.reduce((acc, v) => {
     if (Array.isArray(v)) {
       return acc.concat(v);
@@ -13,15 +14,15 @@ export const flatten = (d) =>
     return acc.concat(v);
   }, []);
 
-export const nonEmpty = (d) => {
+export const nonEmpty = (d: SyntaxNode): boolean => {
   return Array.isArray(d) ? !!d.length : d != null;
 };
 
-export const drop = (d): any[] => {
+export const drop = (d: SyntaxNode[]): any[] => {
   return d.filter(nonEmpty);
 };
 
-export const extendNode = curry(({ ...options }: any, node) => {
+export const extendNode = curry(({ ...options }: any, node: SyntaxNode) => {
   return {
     ...node,
     ...options,
@@ -32,72 +33,74 @@ export const compose = (...fns: any) =>
   fns.reduce((f: any, g: any) => (...args: any[]) => f(g(...args)));
 
 export default function factory() {
-  const node = (type: SyntaxType, seed: any = {}) => (d: Syn[]): Syn => {
+  const node = (type: SyntaxType, seed: Partial<SyntaxNode> = {}) => (
+    d: SyntaxNode[]
+  ): SyntaxNode => {
     const params = drop(d);
-    const { value = '' } = seed;
+    const { value = SyntaxType[type] } = seed;
 
     return {
       value,
-      staticType: null,
+      staticType: SyntaxNativeType.Void,
       type,
       params,
     };
   };
 
-  const string = (d): Syn => {
+  const string = (d: SyntaxNode[]): SyntaxNode => {
     return extendNode(
       {
         value: d[0].value,
-        staticType: 'i32',
+        staticType: SyntaxNativeType.I32,
       },
       node(SyntaxType.StringLiteral)([])
     );
   };
 
-  const char = (d): Syn => {
+  const char = (d: SyntaxNode[]): SyntaxNode => {
     return extendNode(
       {
         value: d[0].value,
-        staticType: 'i32',
+        staticType: SyntaxNativeType.I32,
       },
       node(SyntaxType.CharLiteral)([])
     );
   };
 
-  const float = (d): Syn => {
+  const float = (d: SyntaxNode[]): SyntaxNode => {
     return extendNode(
       {
         value: parseFloat(d[0].value.replace('_', '')),
-        staticType: 'f32',
+        staticType: SyntaxNativeType.F32,
       },
       node(SyntaxType.FloatLiteral)([])
     );
   };
 
-  const bool = (d): Syn => {
+  const bool = (d: SyntaxNode[]): SyntaxNode => {
     return extendNode(
       {
         value: d[0].value === 'true',
-        staticType: 'bool',
+        staticType: SyntaxNativeType.Bool,
       },
       node(SyntaxType.BoolLiteral)([])
     );
   };
 
-  const integer = (d): Syn => {
+  const integer = (d: SyntaxNode[]): SyntaxNode => {
     return extendNode(
       {
         value: parseInt(d[0].value.replace('_', '')),
-        staticType: 'i32',
+        staticType: SyntaxNativeType.I32,
       },
       node(SyntaxType.IntegerLiteral)([])
     );
   };
 
-  const identifier = (d): Syn =>
+  const identifier = (d: SyntaxNode[]): SyntaxNode =>
     node(SyntaxType.Identifier, { value: d.join('') })([]);
 
-  const type = (d): Syn => {
+  const type = (d: SyntaxNode[]): SyntaxNode => {
     return extendNode(
       {
         value: d[0].value,
@@ -108,7 +111,7 @@ export default function factory() {
     );
   };
 
-  const access = (d): Syn => {
+  const access = (d: SyntaxNode[]): SyntaxNode => {
     return extendNode(
       {
         value: d[0].value + '.' + d[1].value,
@@ -117,7 +120,7 @@ export default function factory() {
     );
   };
 
-  const subscript = (d): Syn => {
+  const subscript = (d: SyntaxNode[]): SyntaxNode => {
     const [id, field] = drop(d);
 
     return extendNode(
@@ -129,7 +132,7 @@ export default function factory() {
     );
   };
 
-  const call = (d): Syn => {
+  const call = (d: SyntaxNode[]): SyntaxNode => {
     const [id, ...params] = drop(d);
 
     return extendNode(
@@ -140,7 +143,7 @@ export default function factory() {
     );
   };
 
-  const unary = (d) => {
+  const unary = (d: SyntaxNode[]): SyntaxNode => {
     const [operator, target] = drop(d);
     return extendNode(
       {
@@ -151,7 +154,7 @@ export default function factory() {
     );
   };
 
-  const binary = (d) => {
+  const binary = (d: SyntaxNode[]): SyntaxNode => {
     const [lhs, operator, rhs] = drop(d);
 
     return node(SyntaxType.BinaryExpression, { value: operator.value })([
@@ -160,7 +163,7 @@ export default function factory() {
     ]);
   };
 
-  const assignment = (d) => {
+  const assignment = (d: SyntaxNode[]): SyntaxNode => {
     const [lhs, operator, rhs] = drop(d);
     const { value }: { value: string } = operator;
 
@@ -173,26 +176,28 @@ export default function factory() {
     return node(SyntaxType.AssignmentStatement, { value })([lhs, rhs]);
   };
 
-  const declaration = curry((type: SyntaxType, d) => {
-    const [pair, ...init] = drop(d);
-    const [id, staticType] = pair.params;
+  const declaration = curry(
+    (type: SyntaxType, d: SyntaxNode[]): SyntaxNode => {
+      const [pair, ...init] = drop(d);
+      const [id, staticType] = pair.params;
 
-    return extendNode(
-      { value: id.value, staticType: staticType.value },
-      node(type)(init)
-    );
-  });
+      return extendNode(
+        { value: id.value, staticType: staticType.value },
+        node(type)(init)
+      );
+    }
+  );
 
-  const return_ = (d) => {
+  const return_ = (d: SyntaxNode[]): SyntaxNode => {
     return node(SyntaxType.ReturnStatement)(d);
   };
 
-  const voidfn = (d) => {
+  const voidfn = (d: SyntaxNode[]): SyntaxNode => {
     const params = drop(d);
     const [name, args, block] = params;
 
     const result = extendNode(
-      { staticType: null },
+      { staticType: SyntaxNativeType.Void },
       node(SyntaxType.FunctionResult)([])
     );
 
@@ -205,7 +210,7 @@ export default function factory() {
     );
   };
 
-  const fn = (d) => {
+  const fn = (d: SyntaxNode[]): SyntaxNode => {
     const params = drop(d);
     const [name, args, result, block] = params;
 
@@ -216,13 +221,13 @@ export default function factory() {
     return extendNode(
       {
         value: name.value,
-        params: [args, result, block]
+        params: [args, result, block],
       },
       node(SyntaxType.FunctionDeclaration)(params)
     );
   };
 
-  const result = (d) => {
+  const result = (d: SyntaxNode[]): SyntaxNode => {
     const [type] = drop(d);
     return extendNode(
       {
@@ -232,7 +237,7 @@ export default function factory() {
     );
   };
 
-  const for_ = (d) => {
+  const for_ = (d: SyntaxNode[]): SyntaxNode => {
     const [init, condition, afterthought, ...block] = drop(d);
     return node(SyntaxType.LoopStatement)([
       init,
@@ -242,12 +247,12 @@ export default function factory() {
     ]);
   };
 
-  const while_ = (d) => {
+  const while_ = (d: SyntaxNode[]): SyntaxNode => {
     const noop = node(SyntaxType.Noop)([]);
     return node(SyntaxType.LoopStatement)([noop, ...d]);
   };
 
-  const fnheader = (d) => {
+  const fnheader = (d: SyntaxNode[]): SyntaxNode => {
     const params = drop(d);
     const [name] = params;
 

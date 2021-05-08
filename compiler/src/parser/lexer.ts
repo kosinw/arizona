@@ -22,12 +22,12 @@ export function lexer(): Lexer {
       return mooLexer.reset(chunk, info);
     },
     next() {
-      // It's a cruel and unusual punishment to implement comments with nearly
       let token = mooLexer.next();
-      // Drop all comment tokens found
+
       while (token && token.type === 'comment') {
         token = mooLexer.next();
       }
+
       this.current = token;
       return this.current;
     },

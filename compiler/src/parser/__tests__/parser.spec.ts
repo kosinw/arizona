@@ -5,7 +5,7 @@ import { parse } from '..';
 describe('parser tests', () => {
   it('can parse a very complex program', () => {
     const src = dedent`
-      use fn setPixel(i32, i32) -> f32 from "env";
+      use fn setPixel(x: i32, y: i32) -> f32 from "env";
 
       let i: i32 = 15;
 

@@ -1,4 +1,4 @@
-import { Syn, SyntaxType } from '../parser/types';
+import { SyntaxNode, SyntaxType } from '../parser/types';
 import { GeneratorResult } from './types';
 import binaryen from 'binaryen';
 import invariant from 'invariant';
@@ -14,13 +14,13 @@ export const generatorTypeMap: { [x: string]: binaryen.Type } = {
 };
 
 // all of this is so hacky and probably deserves to be burned in a fire
-export function generate(ast: Syn): GeneratorResult {
+export function generate(ast: SyntaxNode): GeneratorResult {
   const program = new binaryen.Module();
 
-  const generateFunctionBlock = (func: Syn) => {
+  const generateFunctionBlock = (func: SyntaxNode) => {
     const [args, result, ...body] = func.params;
 
-    const arglist = ((args: Syn): binaryen.Type[] => {
+    const arglist = ((args: SyntaxNode): binaryen.Type[] => {
       return args.params
         .map((arg) => {
           return arg.params[1].staticType!;
