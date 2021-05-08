@@ -3,6 +3,7 @@ import { SyntaxStaticType } from '../parser/types';
 export interface Symbol {
   immutable: boolean;
   staticType: SyntaxStaticType;
+  localId?: number;
 }
 
 export interface SymbolTable {
@@ -23,9 +24,10 @@ export interface GlobalSymbolTable extends SymbolTable {
 
 export interface BlockSymbolTable extends SymbolTable {
   blocks: BlockSymbolTable[];
+  lastVisitedBlock: number;
 }
 
 export interface FunctionSymbolTable extends BlockSymbolTable {
-  locals: Record<string, Symbol>;
+  locals: Symbol[];
   returnValue?: Symbol;
 }

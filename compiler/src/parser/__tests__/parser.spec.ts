@@ -16,6 +16,8 @@ describe('parser tests', () => {
           let l: i32 = 0x3a;
           continue;
           break;
+
+          setPixel.petPixel(0, 3);
         }
 
         return (15 ^ 18) << 3 * 99;

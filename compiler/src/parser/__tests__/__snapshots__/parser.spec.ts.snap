@@ -231,6 +231,44 @@ Object {
                           "type": "BreakStatement",
                           "value": "BreakStatement",
                         },
+                        Object {
+                          "params": Array [
+                            Object {
+                              "params": Array [
+                                Object {
+                                  "params": Array [],
+                                  "staticType": "void",
+                                  "type": "Identifier",
+                                  "value": "setPixel",
+                                },
+                                Object {
+                                  "params": Array [],
+                                  "staticType": "void",
+                                  "type": "Identifier",
+                                  "value": "petPixel",
+                                },
+                              ],
+                              "staticType": "void",
+                              "type": "AccessExpression",
+                              "value": "setPixel.petPixel",
+                            },
+                            Object {
+                              "params": Array [],
+                              "staticType": "i32",
+                              "type": "IntegerLiteral",
+                              "value": 0,
+                            },
+                            Object {
+                              "params": Array [],
+                              "staticType": "i32",
+                              "type": "IntegerLiteral",
+                              "value": 3,
+                            },
+                          ],
+                          "staticType": "void",
+                          "type": "FunctionCall",
+                          "value": "setPixel.petPixel",
+                        },
                       ],
                       "staticType": "void",
                       "type": "Block",

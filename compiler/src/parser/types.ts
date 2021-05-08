@@ -63,4 +63,5 @@ export interface SyntaxNode {
   value: string;
   staticType: SyntaxStaticType;
   params: SyntaxNode[];
+  parent?: SyntaxNode;
 }

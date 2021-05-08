@@ -127,9 +127,7 @@ describe('symbol table generation tests', () => {
         }
     `;
 
-    const table = gentab(src);
-
-    console.log(util.inspect(table, { depth: null }));
+    expect(() => gentab(src)).not.toThrow()
   });
 
   it('throws when same variable is defined twice in same scope', () => {

@@ -7,6 +7,7 @@ import {
 } from './types';
 import {
   insert,
+  symb,
   globalsymtab,
   enterFunction,
   exitScope,
@@ -32,10 +33,10 @@ export function generateSymbolTable(syntaxTree: SyntaxNode): GlobalSymbolTable {
         node.staticType != SyntaxNativeType.Void,
         'global variable decorations should have a definite static type'
       );
-      const sym: Symbol = {
+      const sym: Symbol = symb({
         immutable: false,
         staticType: node.staticType,
-      };
+      });
       const name = node.value;
       insert(globalSymbolTable, name, sym);
     },
@@ -45,10 +46,10 @@ export function generateSymbolTable(syntaxTree: SyntaxNode): GlobalSymbolTable {
         node.staticType != SyntaxNativeType.Void,
         'global variable decorations should have a definite static type'
       );
-      const sym: Symbol = {
+      const sym: Symbol = symb({
         immutable: true,
         staticType: node.staticType,
-      };
+      });
       const name = node.value;
       insert(globalSymbolTable, name, sym);
     },
@@ -93,11 +94,13 @@ export function generateSymbolTable(syntaxTree: SyntaxNode): GlobalSymbolTable {
       const pairs = node.params;
       for (let pair of pairs) {
         const [{ value: name }, rhs] = pair.params;
-        const sym: Symbol = {
+        const sym: Symbol = symb({
           immutable: true,
           staticType: rhs.staticType,
-        };
-        insert(currentFunction!, name, sym);
+        });
+        const localId = addLocal(currentFunction!, sym);
+        const s = insert(currentFunction!, name, sym);
+        s.localId = localId;
       }
     },
 
@@ -126,12 +129,13 @@ export function generateSymbolTable(syntaxTree: SyntaxNode): GlobalSymbolTable {
       );
 
       const { value: name } = node;
-      const sym: Symbol = {
+      const sym: Symbol = symb({
         immutable: false,
         staticType: node.staticType,
-      };
-      insert(currentBlock!, name, sym);
-      addLocal(currentFunction, name, sym);
+      });
+      const localId = addLocal(currentFunction, sym);
+      const s = insert(currentBlock!, name, sym);
+      s.localId = localId;
     },
 
     [SyntaxType.ImmutableDeclaration]: (node: SyntaxNode) => {
@@ -145,12 +149,13 @@ export function generateSymbolTable(syntaxTree: SyntaxNode): GlobalSymbolTable {
       );
 
       const { value: name } = node;
-      const sym: Symbol = {
+      const sym: Symbol = symb({
         immutable: false,
         staticType: node.staticType,
-      };
-      insert(currentBlock!, name, sym);
-      addLocal(currentFunction, name, sym);
+      });
+      const localId = addLocal(currentFunction, sym);
+      const s = insert(currentBlock!, name, sym);
+      s.localId = localId;
     },
   };
 

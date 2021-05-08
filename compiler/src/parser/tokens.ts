@@ -1,4 +1,5 @@
 import * as moo from 'moo';
+import { SyntaxNativeType } from './types';
 
 export const keywords = [
   'break',
@@ -61,7 +62,7 @@ export const punctuators = [
   '->',
 ];
 
-export const types = ['i32', ' i64', 'f32', 'f64', 'bool', 'void'];
+export const types = Object.values(SyntaxNativeType);
 
 export const tokens: moo.Rules = {
   whitespace: { match: /\s+/, lineBreaks: true },

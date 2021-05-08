@@ -1,5 +1,6 @@
 import invariant from 'invariant';
-import cuid from 'cuid';
+import { SyntaxNativeType } from '../parser/types';
+
 import {
   SymbolTable,
   Symbol,
@@ -27,6 +28,7 @@ export function blocksymtab(
     blocks: partial.blocks || [],
     symbols: partial.symbols || {},
     parentTable: partial.parentTable,
+    lastVisitedBlock: partial.lastVisitedBlock || 0,
   };
 }
 
@@ -36,21 +38,24 @@ export function fnsymtab(
   return {
     blocks: partial.blocks || [],
     symbols: partial.symbols || {},
-    locals: partial.locals || {},
+    locals: partial.locals || [],
     returnValue: partial.returnValue,
     parentTable: partial.parentTable,
+    lastVisitedBlock: partial.lastVisitedBlock || 0,
   };
 }
 
-export function insert(
-  table: SymbolTable,
-  name: string,
-  sym: Symbol
-): SymbolTable {
+export function symb(partial: Partial<Symbol>): Symbol {
+  return {
+    immutable: partial.immutable || false,
+    staticType: partial.staticType || SyntaxNativeType.Void,
+  };
+}
+
+export function insert(table: SymbolTable, name: string, sym: Symbol): Symbol {
   invariant(!(name in table.symbols), 'cannot define same variable twice');
 
-  table.symbols[name] = sym;
-  return table;
+  return (table.symbols[name] = sym);
 }
 
 // NOTE(kosi): HOLY SHIT THIS IS THE HACKIEST SHIT EVER
@@ -59,13 +64,9 @@ export function insert(
 //
 // Probably the correct way to do this is to give the block a unique identifier
 // and add that to the variable as a suffix?
-export function addLocal(
-  fn: FunctionSymbolTable,
-  name: string,
-  sym: Symbol
-): FunctionSymbolTable {
-  fn.locals[name + '-' + cuid()] = sym;
-  return fn;
+
+export function addLocal(fn: FunctionSymbolTable, sym: Symbol): number {
+  return fn.locals.push(sym) - 1;
 }
 
 export function addExport(
@@ -105,8 +106,14 @@ export function enterFunction(
   return (parent.functions[name] = fnsymtab({ parentTable: parent }));
 }
 
-export function exitScope(table: BlockSymbolTable): BlockSymbolTable | null {
-  if (!!table.parentTable && !table.parentTable) {
+export function exitScope(
+  table: BlockSymbolTable | null
+): BlockSymbolTable | null {
+  if (!table) {
+    return null;
+  }
+
+  if (!!table.parentTable && !table.parentTable.parentTable) {
     return null;
   }
 
