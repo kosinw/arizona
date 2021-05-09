@@ -36,6 +36,7 @@ export function generateSymbolTable(syntaxTree: SyntaxNode): GlobalSymbolTable {
       const sym: Symbol = symb({
         immutable: false,
         staticType: node.staticType,
+        global: true,
       });
       const name = node.value;
       insert(globalSymbolTable, name, sym);
@@ -49,6 +50,7 @@ export function generateSymbolTable(syntaxTree: SyntaxNode): GlobalSymbolTable {
       const sym: Symbol = symb({
         immutable: true,
         staticType: node.staticType,
+        global: true,
       });
       const name = node.value;
       insert(globalSymbolTable, name, sym);

@@ -82,11 +82,11 @@ Statement ->
     | Continue                                            {% id %}
 
 GlobalVariableDeclaration ->
-      LET _ NameAndType _ EQUALS _ Atom TERMINATOR              {% syntax.declaration(SyntaxType.GlobalVariableDeclaration) %}
+      LET _ NameAndType _ EQUALS _ Expression TERMINATOR              {% syntax.declaration(SyntaxType.GlobalVariableDeclaration) %}
     | LET _ NameAndType TERMINATOR                              {% syntax.declaration(SyntaxType.GlobalVariableDeclaration) %}
 
 GlobalImmutableDeclaration ->
-      CONST _ NameAndType _ EQUALS _ Atom TERMINATOR            {% syntax.declaration(SyntaxType.GlobalImmutableDeclaration) %}
+      CONST _ NameAndType _ EQUALS _ Expression TERMINATOR            {% syntax.declaration(SyntaxType.GlobalImmutableDeclaration) %}
 
 VariableDeclaration ->
       LET _ NameAndType _ EQUALS _ Expression TERMINATOR        {% syntax.declaration(SyntaxType.VariableDeclaration) %}
@@ -112,6 +112,11 @@ _Assignment ->
     | Subscript _ "/=" _ Expression                     {% syntax.assignment %}
     | Subscript _ "*=" _ Expression                     {% syntax.assignment %}
     | Subscript _ "%=" _ Expression                     {% syntax.assignment %}
+    | Subscript _ "&=" _ Expression                     {% syntax.assignment %}
+    | Subscript _ "|=" _ Expression                     {% syntax.assignment %}
+    | Subscript _ "^=" _ Expression                     {% syntax.assignment %}
+    | Subscript _ ">>=" _ Expression                    {% syntax.assignment %}
+    | Subscript _ "<<=" _ Expression                    {% syntax.assignment %}
 
 ExpressionStatement -> Expression TERMINATOR          {% id %}
 
@@ -153,16 +158,20 @@ Sum ->
     | Product                                   {% id %}
 
 Product ->
-      Product _ "*" _ Unary                     {% syntax.binary %}
-    | Product _ "/" _ Unary                     {% syntax.binary %}
-    | Product _ "%" _ Unary                     {% syntax.binary %}
+      Product _ "*" _ Typecast                     {% syntax.binary %}
+    | Product _ "/" _ Typecast                     {% syntax.binary %}
+    | Product _ "%" _ Typecast                     {% syntax.binary %}
+    | Typecast                                     {% id %}
+
+Typecast ->
+      LANGLE _ DeclType _ RANGLE _ Unary        {% syntax.typecast %}
     | Unary                                     {% id %}
 
 Unary ->
       "!" Call                                  {% syntax.unary %}
     | "~" Call                                  {% syntax.unary %}
-    | "!" Call                                  {% syntax.unary %}
     | "+" Call                                  {% syntax.unary %}
+    | "-" Call                                  {% syntax.unary %}
     | Call                                      {% id %}
 
 Call ->
@@ -186,7 +195,7 @@ Access ->
     | Grouping                      {% id %}
 
 Grouping ->
-      LP _ Expression _ RP            {% nth(2) %}
+      LP _ Expression _ RP          {% nth(2) %}
     | Atom                          {% id %}
 
 Atom ->

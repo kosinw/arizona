@@ -38,13 +38,13 @@ export enum SyntaxType {
   Block = 'Block',
   Export = 'Export',
   IfStatement = 'IfStatement',
-  ElseStatement = 'ElseStatement',
   LoopStatement = 'LoopStatement',
   BreakStatement = 'BreakStatement',
   ContinueStatement = 'ContinueStatement',
   Noop = 'Noop',
   UseFunctionDeclaration = 'UseFunctionDeclaration',
   FunctionHeaderDeclaration = 'FunctionHeaderDeclaration',
+  TypecastExpression = 'TypecastExpression'
 }
 
 export enum SyntaxNativeType {
@@ -60,8 +60,9 @@ export type SyntaxStaticType = SyntaxNativeType | string;
 
 export interface SyntaxNode {
   type: SyntaxType;
-  value: string;
+  value: any;
   staticType: SyntaxStaticType;
   params: SyntaxNode[];
   parent?: SyntaxNode;
+  lhs?: boolean;
 }

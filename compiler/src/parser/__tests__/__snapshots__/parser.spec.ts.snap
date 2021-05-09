@@ -153,12 +153,12 @@ Object {
               "params": Array [
                 Object {
                   "params": Array [],
-                  "staticType": "i32",
+                  "staticType": "bool",
                   "type": "Type",
-                  "value": "i32",
+                  "value": "bool",
                 },
               ],
-              "staticType": "i32",
+              "staticType": "bool",
               "type": "FunctionResult",
               "value": "FunctionResult",
             },
@@ -166,12 +166,6 @@ Object {
               "params": Array [
                 Object {
                   "params": Array [
-                    Object {
-                      "params": Array [],
-                      "staticType": "void",
-                      "type": "Noop",
-                      "value": "Noop",
-                    },
                     Object {
                       "params": Array [],
                       "staticType": "bool",
@@ -184,90 +178,34 @@ Object {
                           "params": Array [
                             Object {
                               "params": Array [],
-                              "staticType": "i32",
-                              "type": "IntegerLiteral",
-                              "value": 16,
+                              "staticType": "bool",
+                              "type": "BoolLiteral",
+                              "value": true,
                             },
                           ],
-                          "staticType": "i32",
-                          "type": "VariableDeclaration",
-                          "value": "j",
+                          "staticType": "void",
+                          "type": "ReturnStatement",
+                          "value": "ReturnStatement",
                         },
+                      ],
+                      "staticType": "void",
+                      "type": "Block",
+                      "value": "Block",
+                    },
+                    Object {
+                      "params": Array [
                         Object {
                           "params": Array [
                             Object {
                               "params": Array [],
-                              "staticType": "f32",
-                              "type": "FloatLiteral",
-                              "value": 1.23456,
-                            },
-                          ],
-                          "staticType": "f64",
-                          "type": "VariableDeclaration",
-                          "value": "k",
-                        },
-                        Object {
-                          "params": Array [
-                            Object {
-                              "params": Array [],
-                              "staticType": "i32",
-                              "type": "IntegerLiteral",
-                              "value": 58,
-                            },
-                          ],
-                          "staticType": "i32",
-                          "type": "VariableDeclaration",
-                          "value": "l",
-                        },
-                        Object {
-                          "params": Array [],
-                          "staticType": "void",
-                          "type": "ContinueStatement",
-                          "value": "ContinueStatement",
-                        },
-                        Object {
-                          "params": Array [],
-                          "staticType": "void",
-                          "type": "BreakStatement",
-                          "value": "BreakStatement",
-                        },
-                        Object {
-                          "params": Array [
-                            Object {
-                              "params": Array [
-                                Object {
-                                  "params": Array [],
-                                  "staticType": "void",
-                                  "type": "Identifier",
-                                  "value": "setPixel",
-                                },
-                                Object {
-                                  "params": Array [],
-                                  "staticType": "void",
-                                  "type": "Identifier",
-                                  "value": "petPixel",
-                                },
-                              ],
-                              "staticType": "void",
-                              "type": "AccessExpression",
-                              "value": "setPixel.petPixel",
-                            },
-                            Object {
-                              "params": Array [],
-                              "staticType": "i32",
-                              "type": "IntegerLiteral",
-                              "value": 0,
-                            },
-                            Object {
-                              "params": Array [],
-                              "staticType": "i32",
-                              "type": "IntegerLiteral",
-                              "value": 3,
+                              "staticType": "bool",
+                              "type": "BoolLiteral",
+                              "value": false,
                             },
                           ],
                           "staticType": "void",
-                          "type": "FunctionCall",
-                          "value": "setPixel.petPixel",
+                          "type": "ReturnStatement",
+                          "value": "ReturnStatement",
                         },
                       ],
                       "staticType": "void",
@@ -276,60 +214,8 @@ Object {
                     },
                   ],
                   "staticType": "void",
-                  "type": "LoopStatement",
-                  "value": "LoopStatement",
-                },
-                Object {
-                  "params": Array [
-                    Object {
-                      "params": Array [
-                        Object {
-                          "params": Array [
-                            Object {
-                              "params": Array [],
-                              "staticType": "i32",
-                              "type": "IntegerLiteral",
-                              "value": 15,
-                            },
-                            Object {
-                              "params": Array [],
-                              "staticType": "i32",
-                              "type": "IntegerLiteral",
-                              "value": 18,
-                            },
-                          ],
-                          "staticType": "void",
-                          "type": "BinaryExpression",
-                          "value": "^",
-                        },
-                        Object {
-                          "params": Array [
-                            Object {
-                              "params": Array [],
-                              "staticType": "i32",
-                              "type": "IntegerLiteral",
-                              "value": 3,
-                            },
-                            Object {
-                              "params": Array [],
-                              "staticType": "i32",
-                              "type": "IntegerLiteral",
-                              "value": 99,
-                            },
-                          ],
-                          "staticType": "void",
-                          "type": "BinaryExpression",
-                          "value": "*",
-                        },
-                      ],
-                      "staticType": "void",
-                      "type": "BinaryExpression",
-                      "value": "<<",
-                    },
-                  ],
-                  "staticType": "void",
-                  "type": "ReturnStatement",
-                  "value": "ReturnStatement",
+                  "type": "IfStatement",
+                  "value": "IfStatement",
                 },
               ],
               "staticType": "void",

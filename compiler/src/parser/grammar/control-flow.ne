@@ -3,8 +3,8 @@ IfStatement ->
     | IF _ Expression _ Block _ ElseStatement  {% syntax.node(SyntaxType.IfStatement) %}
 
 ElseStatement ->
-      ELSE _ Block                             {% syntax.node(SyntaxType.ElseStatement) %}
-    | ELSE _ IfStatement                       {% syntax.node(SyntaxType.ElseStatement) %}
+      ELSE _ Block                             {% syntax.else %}
+    | ELSE _ IfStatement                       {% syntax.else %}
 
 ForStatement ->
       FOR _ _Assignment TERMINATOR _ Expression TERMINATOR _ _Assignment _ Block

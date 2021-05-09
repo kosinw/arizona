@@ -4,6 +4,7 @@ export interface Symbol {
   immutable: boolean;
   staticType: SyntaxStaticType;
   localId?: number;
+  global?: boolean;
 }
 
 export interface SymbolTable {

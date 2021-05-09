@@ -2,35 +2,31 @@ import { describe, it, expect } from '@jest/globals';
 import dedent from 'dedent';
 import { parse } from '../../parser/';
 import { generate } from '..';
-import { GeneratorResult } from '../types';
 import { generateSymbolTable } from '../../semantics/index';
+import binaryen from 'binaryen';
 
-const generateCode = (src: string): GeneratorResult => {
+const generateCode = (src: string): binaryen.Module => {
   const ast = parse(src);
   const symtab = generateSymbolTable(ast);
   return generate(ast, symtab);
 };
 
-describe('parser tests', () => {
-  it('can parse a very complex program', () => {
+describe('codegen tests', () => {
+  it('can generate a very complex program', () => {
     const src = dedent`
-      export const baz: f32 = 12.24;
-
-      export fn echo(a: i32, b: i32) -> f32 {
-          let foo: i32 = 42;
-          let bar: f32 = 5.6;
-
-          {
-            let foo: f32 = 65.67;
-          }
-
-          return bar;
+      export fn fibonacci(n: i32) -> i32 {
+        if (n <= 0) {
+          return n;
+        } else {
+          return fibonacci(n - 1) + fibonacci(n - 2);
+        }
       }
     `;
 
     const program = generateCode(src);
 
     console.log(program.emitText());
-    // expect(parser.results.length).toEqual(1);
+
+    expect(program.validate()).toBeTruthy();
   });
 });

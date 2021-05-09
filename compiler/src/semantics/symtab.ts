@@ -49,6 +49,7 @@ export function symb(partial: Partial<Symbol>): Symbol {
   return {
     immutable: partial.immutable || false,
     staticType: partial.staticType || SyntaxNativeType.Void,
+    global: partial.global || false
   };
 }
 

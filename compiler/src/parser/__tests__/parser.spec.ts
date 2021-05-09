@@ -9,18 +9,12 @@ describe('parser tests', () => {
 
       let i: i32 = 15;
 
-      export fn echo(a: i32, c: f64) -> i32 {
-        while true {
-          let j: i32 = 16;
-          let k: f64 = 1.23456;
-          let l: i32 = 0x3a;
-          continue;
-          break;
-
-          setPixel.petPixel(0, 3);
+      export fn echo(a: i32, c: f64) -> bool {
+        if true {
+           return true;
+        } else {
+          return false;
         }
-
-        return (15 ^ 18) << 3 * 99;
       }
     `;
     
