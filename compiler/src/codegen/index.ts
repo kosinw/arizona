@@ -16,7 +16,7 @@ import {
 } from '../semantics/types';
 import { exitScope, lookup, lookupFunction } from '../semantics/symtab';
 import cuid from 'cuid';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 const binopTable: Record<string, string> = {
   '+': 'add',
@@ -76,7 +76,7 @@ const typeConversionTable: Record<string, string> = {
 };
 
 function binaryenType(type: SyntaxStaticType): binaryen.Type {
-  const t = nativeType(type);
+  const t = nativeType(type)!;
   if (t in binaryen) {
     return binaryen[t];
   }
@@ -87,9 +87,13 @@ function typecast(
   from: SyntaxStaticType,
   to: SyntaxStaticType,
   mod: binaryen.Module
-): (x: binaryen.ExpressionRef) => binaryen.ExpressionRef {
+): ((x: binaryen.ExpressionRef) => binaryen.ExpressionRef) | null {
   const predicate = `${nativeType(from)}->${nativeType(to)}`;
   const cmd = typeConversionTable[predicate];
+
+  if (cmd === 'nop') {
+    return null;
+  }
 
   return _.get(mod, cmd);
 }
@@ -98,11 +102,11 @@ function typecastToGreaterType(
   a: SyntaxStaticType,
   b: SyntaxStaticType,
   mod: binaryen.Module
-): (x: binaryen.ExpressionRef) => binaryen.ExpressionRef {
+): ((x: binaryen.ExpressionRef) => binaryen.ExpressionRef) | null {
   const an = nativeType(a);
   const bn = nativeType(b);
 
-  if (nativeTypeRanking[nativeType(a)] > nativeTypeRanking[nativeType(b)]) {
+  if (nativeTypeRanking[nativeType(a)!] > nativeTypeRanking[nativeType(b)!]) {
     return typecast(b, a, mod);
   }
 
@@ -113,7 +117,7 @@ function greaterType(
   a: SyntaxStaticType,
   b: SyntaxStaticType
 ): SyntaxStaticType {
-  if (nativeTypeRanking[nativeType(a)] > nativeTypeRanking[nativeType(b)]) {
+  if (nativeTypeRanking[nativeType(a)!] > nativeTypeRanking[nativeType(b)!]) {
     return a;
   }
 
@@ -132,14 +136,14 @@ function tryPromote(
   return null;
 }
 
-function nativeType(t: SyntaxStaticType): SyntaxNativeType {
+function nativeType(t: SyntaxStaticType): SyntaxNativeType | null {
   if (t in binaryen) {
     return t as SyntaxNativeType;
   } else if (t in typeTable) {
     return typeTable[t];
   }
 
-  invariant(false, 'no native type for given type');
+  return null;
 }
 
 function prefixModuleMember(name: string): string {
@@ -177,8 +181,8 @@ export function generate(
     const t = binaryenType(globalEntry.staticType);
 
     // TODO(kosi): Abstract this out
-    const lt = nativeType(globalEntry.staticType);
-    const rt = nativeType(node.params[0].staticType);
+    const lt = nativeType(globalEntry.staticType)!;
+    const rt = nativeType(node.params[0].staticType)!;
 
     // Try integer promotion otherwise just raise an error
     let rexpr = children[0]!;
@@ -205,8 +209,8 @@ export function generate(
   ) => {
     const localSymbol = lookup(currentScope!, node.value)!;
     // TODO(kosi): Abstract this out
-    const lt = nativeType(localSymbol.staticType);
-    const rt = nativeType(node.params[0].staticType);
+    const lt = nativeType(localSymbol.staticType)!;
+    const rt = nativeType(node.params[0].staticType)!;
 
     // Try integer promotion otherwise just raise an error
     let rExpr = children[0]!;
@@ -228,7 +232,7 @@ export function generate(
   };
 
   const numberLiteral: TransformCallback<binaryen.Type> = (node, _chidlren) =>
-    globalModule[nativeType(node.staticType)].const(node.value);
+    globalModule[nativeType(node.staticType)!].const(node.value);
 
   const traverseMap: TransformMap<binaryen.Type> = {
     [SyntaxType.FunctionDeclaration]: {
@@ -328,7 +332,7 @@ export function generate(
     [SyntaxType.FunctionCall]: (node, children) => {
       // TODO(kosi): This will 100% break with access types
       const fn = lookupFunction(symtab, node.value)!;
-      const retType = nativeType(fn.returnValue?.staticType!);
+      const retType = nativeType(fn.returnValue?.staticType!)!;
 
       invariant(
         Object.values(fn.symbols).length === children.length,
@@ -336,13 +340,11 @@ export function generate(
       );
       node.staticType = retType;
 
-      if (!(node.value in symtab.imports)) {
-        return globalModule.call(
-          prefixModuleMember(node.value),
-          children.map((c) => c!),
-          binaryenType(retType)
-        );
-      }
+      return globalModule.call(
+        prefixModuleMember(node.value),
+        children.map((c) => c!),
+        binaryenType(retType)
+      );
     },
 
     [SyntaxType.Noop]: (node, children) => globalModule.nop(),
@@ -382,6 +384,32 @@ export function generate(
       }
     },
 
+    [SyntaxType.UseFunctionDeclaration]: (node, _) => {
+      const moduleName = node.params[0].value;
+      const fnEntry = symtab.functions[moduleName];
+
+      const internalName = prefixModuleMember(moduleName);
+
+      // TODO(kosi): Add base module information to symbol table
+      const externalModule = node.params[1].value;
+
+      const procParamType = binaryen.createType(
+        Object.values(fnEntry.symbols).map((sym) =>
+          binaryenType(sym.staticType)
+        )
+      );
+
+      const procReturnType = binaryenType(fnEntry.returnValue!.staticType);
+
+      return globalModule.addFunctionImport(
+        internalName,
+        externalModule,
+        moduleName,
+        procParamType,
+        procReturnType
+      );
+    },
+
     [SyntaxType.BinaryExpression]: (node, children) => {
       // TODO(kosi): Add a switch-case table here
       const [l, rhs] = node.params;
@@ -390,8 +418,8 @@ export function generate(
 
         const type =
           node.value === '||' || node.value === '&&'
-            ? nativeType('bool')
-            : nativeType(greaterType(l.staticType, rhs.staticType));
+            ? nativeType('bool')!
+            : nativeType(greaterType(l.staticType, rhs.staticType))!;
 
         // NOTE(kosi): Very big hack, but remove _s for floatingd types and add _u for unsigned types
         if (type.indexOf('f') !== -1) {
@@ -412,9 +440,12 @@ export function generate(
             globalModule
           );
 
-          if (greaterType(l.staticType, rhs.staticType) === l.staticType) {
+          if (
+            !!cast &&
+            greaterType(l.staticType, rhs.staticType) === l.staticType
+          ) {
             rexpr = cast(rexpr);
-          } else {
+          } else if (!!cast) {
             lexpr = cast(lexpr);
           }
         }
@@ -433,13 +464,13 @@ export function generate(
     },
 
     [SyntaxType.TypecastExpression]: (node, children) => {
-      const castExpr = typecast(
+      const cast = typecast(
         node.params[0].staticType,
         node.staticType,
         globalModule
       );
 
-      return castExpr(children[0]!);
+      return !!cast ? cast(children[0]!) : children[0]!;
     },
 
     // TODO(kosi): Merge this with binary expression by just change table
@@ -448,9 +479,11 @@ export function generate(
 
       if (node.value in unopTable) {
         const operator = unopTable[node.value];
-        node.staticType = nativeType(l.staticType);
+        node.staticType = nativeType(l.staticType)!;
 
-        const r = globalModule[nativeType(l.staticType)][operator](...children);
+        const r = globalModule[nativeType(l.staticType)!][operator](
+          ...children
+        );
 
         // NOTE(kosi): This means this is just an expression statement, we should drop this value
         if (node.parent?.type === SyntaxType.Block) {
@@ -471,8 +504,8 @@ export function generate(
       invariant(!lhs?.immutable, 'cannot mutate immutable variables');
 
       // TODO(kosi): Abstract this out
-      const lt = nativeType(l.staticType);
-      const rt = nativeType(r.staticType);
+      const lt = nativeType(l.staticType)!;
+      const rt = nativeType(r.staticType)!;
 
       // Try integer promotion otherwise just raise an error
       let rExpr = children[1]!;

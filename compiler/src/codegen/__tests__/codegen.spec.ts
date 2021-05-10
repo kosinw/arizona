@@ -14,9 +14,12 @@ const generateCode = (src: string): binaryen.Module => {
 describe('codegen tests', () => {
   it('can generate a very complex program', () => {
     const src = dedent`
+      use fn console_log(x: i32) -> void from 'env';
+
       export fn fibonacci(n: i32) -> i32 {
         if (n <= 0) {
-          return n;
+          console_log(n);
+          return <i32>n;
         } else {
           return fibonacci(n - 1) + fibonacci(n - 2);
         }
