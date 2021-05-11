@@ -8,14 +8,21 @@ import { CompileResult } from './types';
  * Compiles an Arizona program into WebAssembly.
  * @param source Arizona source code
  */
-export function compile(source: string): CompileResult {
+export function compile(
+  source: string,
+  optimize: boolean = false
+): CompileResult {
   const ast = parse(source);
   const symtab = generateSymbolTable(ast);
   const wasm = generate(ast, symtab);
 
+  if (optimize) {
+    wasm.optimize();
+  }
+
   return {
     text: wasm.emitText(),
     buffer: wasm.emitBinary(),
-    ast
+    ast,
   };
 }
