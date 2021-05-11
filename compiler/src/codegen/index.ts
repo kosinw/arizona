@@ -596,11 +596,6 @@ export function generate(
 
   transform(traverseMap)(ast);
 
-  invariant(
-    !!globalModule.validate(),
-    'WebAssembly module could not validate, code generation was poor.'
-  );
-
   // globalModule.optimize();
 
   return globalModule;

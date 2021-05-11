@@ -1,9 +1,10 @@
 {
   "name": "@arizona/compiler",
   "version": "0.1.0",
-  "description": "Simple, imperative programming language for WebAssembly. 🚀",
+  "description": "Simple, imperative programming language for WebAssembly.",
   "private": "true",
-  "main": "dist/arizona.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
     "build": "tsc",

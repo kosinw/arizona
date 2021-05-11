@@ -13,7 +13,10 @@
     "url": "git+https://github.com/kosinw/arizona"
   },
   "scripts": {
-    "compiler": "yarn workspace @arizona/compiler"
+    "compiler": "yarn workspace @arizona/compiler",
+    "cli": "yarn workspace @arizona/cli",
+    "build": "yarn compiler build && yarn cli build",
+    "setup": "yarn build && yarn cli installbin"
   },
   "devDependencies": {
     "@tsconfig/node14": "^1.0.0",
