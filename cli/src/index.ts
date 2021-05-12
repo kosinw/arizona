@@ -21,6 +21,9 @@ async function run(entryFile: string) {
     binaryen: {
       noValidate: options.noValidate,
     },
+    memory: {
+      import: options.memoryImport
+    }
   };
 
   const sourcePath = path.resolve(process.cwd(), entryFile);
@@ -93,6 +96,7 @@ async function main() {
     .option('--debug', 'Enable debug information in binaries.')
     .option('--sourceMap', 'Enables source map generation.')
     .option('--noValidate', 'Skips Binaryen module validation.')
+    .option('--memoryImport', 'Imports the memory from env.memory')
     .option('-o, --outFile <file>', 'Specifies the binary output file (.wasm)')
     .option('-t, --textFile <file>', 'Specifies the text output file (.wat)')
     .description(

@@ -1,9 +1,9 @@
-import { setDebugInfo, setOptimizeLevel, setShrinkLevel } from 'binaryen';
-import invariant from 'invariant';
-import { generate } from './codegen';
-import { parse } from './parser';
-import { generateSymbolTable } from './semantics/index';
-import { CompileOptions, CompileResult } from './types';
+import { setDebugInfo, setOptimizeLevel, setShrinkLevel } from "binaryen";
+import invariant from "invariant";
+import { generate } from "./codegen";
+import { parse } from "./parser";
+import { generateSymbolTable } from "./semantics/index";
+import { CompileOptions, CompileResult } from "./types";
 
 export { CompileOptions, CompileResult };
 
@@ -30,12 +30,12 @@ export function compile(
   if (!!options.optimization?.shrinkLevel) {
     setShrinkLevel(options.optimization.shrinkLevel);
   }
-  
-  const wasm = generate(ast, symtab);
+
+  const wasm = generate(ast, symtab, options.memory?.import);
 
   invariant(
     !!options.binaryen?.noValidate ? true : !!wasm.validate(),
-    'WebAssembly module could not validate, code generation was poor.'
+    "WebAssembly module could not validate, code generation was poor."
   );
 
   if (!!options.optimization?.level) {
@@ -49,7 +49,7 @@ export function compile(
   }
 
   return {
-    text: wasm.emitText(),
+    text: wasm.emitStackIR(),
     buffer,
     ast,
   };

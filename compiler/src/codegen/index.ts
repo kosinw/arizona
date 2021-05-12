@@ -3,43 +3,42 @@ import {
   SyntaxNode,
   SyntaxStaticType,
   SyntaxType,
-} from '../parser/types';
-import binaryen from 'binaryen';
-import invariant from 'invariant';
-import { transform } from '../common/transform';
-import { Nullable, TransformCallback, TransformMap } from '../common/types';
+} from "../parser/types";
+import binaryen from "binaryen";
+import invariant from "invariant";
+import { transform } from "../common/transform";
+import { Nullable, TransformCallback, TransformMap } from "../common/types";
 import {
   BlockSymbolTable,
   FunctionSymbolTable,
   GlobalSymbolTable,
   GlobalSymbolTablePortationType,
-} from '../semantics/types';
-import { exitScope, lookup, lookupFunction } from '../semantics/symtab';
-import cuid from 'cuid';
-import _ from 'lodash';
+} from "../semantics/types";
+import { exitScope, lookup, lookupFunction } from "../semantics/symtab";
+import _ from "lodash";
 
 const binopTable: Record<string, string> = {
-  '+': 'add',
-  '-': 'sub',
-  '*': 'mul',
-  '/': 'div_s',
-  '%': 'rem_s',
-  '<<': 'shl',
-  '>>': 'shr_s',
-  '^': 'xor',
-  '&': 'and',
-  '|': 'or',
-  '==': 'eq',
-  '!=': 'ne',
-  '<': 'lt_s',
-  '>': 'gt_s',
-  '<=': 'le_s',
-  '>=': 'ge_s',
+  "+": "add",
+  "-": "sub",
+  "*": "mul",
+  "/": "div_u",
+  "%": "rem_u",
+  "<<": "shl",
+  ">>": "shr_u",
+  "^": "xor",
+  "&": "and",
+  "|": "or",
+  "==": "eq",
+  "!=": "ne",
+  "<": "lt_u",
+  ">": "gt_u",
+  "<=": "le_u",
+  ">=": "ge_u",
 };
 
 const unopTable: Record<string, string> = {
-  '!': 'eqz',
-  '+': 'abs',
+  "!": "eqz",
+  "+": "abs",
 };
 
 const typeTable: Record<SyntaxStaticType, SyntaxNativeType> = {
@@ -53,26 +52,33 @@ const nativeTypeRanking: Record<SyntaxStaticType, number> = {
   [SyntaxNativeType.F64]: 2,
 };
 
+let globalCounter = 0;
+function getNextBlockId(): string {
+  let a = globalCounter.toString();
+  globalCounter++;
+  return a.toString();
+}
+
 const typeConversionTable: Record<string, string> = {
-  [`${SyntaxNativeType.I64}->${SyntaxNativeType.I32}`]: 'i32.wrap',
-  [`${SyntaxNativeType.I32}->${SyntaxNativeType.I32}`]: 'nop',
-  [`${SyntaxNativeType.F32}->${SyntaxNativeType.I32}`]: 'i32.trunc_s.f32',
-  [`${SyntaxNativeType.F64}->${SyntaxNativeType.I32}`]: 'i32.trunc_s.f64',
+  [`${SyntaxNativeType.I64}->${SyntaxNativeType.I32}`]: "i32.wrap",
+  [`${SyntaxNativeType.I32}->${SyntaxNativeType.I32}`]: "nop",
+  [`${SyntaxNativeType.F32}->${SyntaxNativeType.I32}`]: "i32.trunc_s.f32",
+  [`${SyntaxNativeType.F64}->${SyntaxNativeType.I32}`]: "i32.trunc_s.f64",
 
-  [`${SyntaxNativeType.I64}->${SyntaxNativeType.I64}`]: 'nop',
-  [`${SyntaxNativeType.I32}->${SyntaxNativeType.I64}`]: 'i64.extend_s',
-  [`${SyntaxNativeType.F32}->${SyntaxNativeType.I64}`]: 'i64.trunc_s.f32',
-  [`${SyntaxNativeType.F64}->${SyntaxNativeType.I64}`]: 'i64.trunc_s.f64',
+  [`${SyntaxNativeType.I64}->${SyntaxNativeType.I64}`]: "nop",
+  [`${SyntaxNativeType.I32}->${SyntaxNativeType.I64}`]: "i64.extend_s",
+  [`${SyntaxNativeType.F32}->${SyntaxNativeType.I64}`]: "i64.trunc_s.f32",
+  [`${SyntaxNativeType.F64}->${SyntaxNativeType.I64}`]: "i64.trunc_s.f64",
 
-  [`${SyntaxNativeType.I64}->${SyntaxNativeType.F32}`]: 'f32.convert_s.i64',
-  [`${SyntaxNativeType.I32}->${SyntaxNativeType.F32}`]: 'f32.convert_s.i32',
-  [`${SyntaxNativeType.F32}->${SyntaxNativeType.F32}`]: 'nop',
-  [`${SyntaxNativeType.F64}->${SyntaxNativeType.F32}`]: 'f32.demote',
+  [`${SyntaxNativeType.I64}->${SyntaxNativeType.F32}`]: "f32.convert_s.i64",
+  [`${SyntaxNativeType.I32}->${SyntaxNativeType.F32}`]: "f32.convert_s.i32",
+  [`${SyntaxNativeType.F32}->${SyntaxNativeType.F32}`]: "nop",
+  [`${SyntaxNativeType.F64}->${SyntaxNativeType.F32}`]: "f32.demote",
 
-  [`${SyntaxNativeType.I64}->${SyntaxNativeType.F64}`]: 'f64.convert_s.i64',
-  [`${SyntaxNativeType.I32}->${SyntaxNativeType.F64}`]: 'f64.convert_s.i32',
-  [`${SyntaxNativeType.F32}->${SyntaxNativeType.F64}`]: 'f64.promote',
-  [`${SyntaxNativeType.F64}->${SyntaxNativeType.F64}`]: 'nop',
+  [`${SyntaxNativeType.I64}->${SyntaxNativeType.F64}`]: "f64.convert_s.i64",
+  [`${SyntaxNativeType.I32}->${SyntaxNativeType.F64}`]: "f64.convert_s.i32",
+  [`${SyntaxNativeType.F32}->${SyntaxNativeType.F64}`]: "f64.promote",
+  [`${SyntaxNativeType.F64}->${SyntaxNativeType.F64}`]: "nop",
 };
 
 function binaryenType(type: SyntaxStaticType): binaryen.Type {
@@ -91,7 +97,7 @@ function typecast(
   const predicate = `${nativeType(from)}->${nativeType(to)}`;
   const cmd = typeConversionTable[predicate];
 
-  if (cmd === 'nop') {
+  if (cmd === "nop") {
     return null;
   }
 
@@ -124,16 +130,13 @@ function greaterType(
   return b;
 }
 
+// TODO(kosi): No holds barred, convert anything without caring about integer promotion rules.
 function tryPromote(
   from: SyntaxStaticType,
   to: SyntaxStaticType,
   mod: binaryen.Module
 ): Nullable<(x: binaryen.ExpressionRef) => binaryen.ExpressionRef> {
-  if (nativeTypeRanking[to] > nativeTypeRanking[from]) {
-    return typecast(from, to, mod);
-  }
-
-  return null;
+  return typecast(from, to, mod);
 }
 
 function nativeType(t: SyntaxStaticType): SyntaxNativeType | null {
@@ -147,7 +150,7 @@ function nativeType(t: SyntaxStaticType): SyntaxNativeType | null {
 }
 
 function prefixModuleMember(name: string): string {
-  return 'module/' + name;
+  return "module/" + name;
 }
 
 function filterNull<T>(arr: Nullable<T>[]): T[] {
@@ -157,19 +160,26 @@ function filterNull<T>(arr: Nullable<T>[]): T[] {
 // all of this is so hacky and probably deserves to be burned in a fire
 export function generate(
   ast: SyntaxNode,
-  symtab: GlobalSymbolTable
+  symtab: GlobalSymbolTable,
+  memoryImport: boolean = false
 ): binaryen.Module {
-  const globalModule = new binaryen.Module();
+  const mod = new binaryen.Module();
 
   let currentScope: Nullable<BlockSymbolTable> = null;
   let currentRetValue: Nullable<SyntaxStaticType> = null;
   const loopLabelStack: string[] = [];
 
   // @ts-ignore
-  const emptyBlock = globalModule.block(null, []);
+  const emptyBlock = mod.block(null, []);
+
+  mod.setMemory(0, -1, null, []);
+
+  if (memoryImport) {
+    mod.addMemoryImport("0", "env", "memory");
+  }
 
   // @ts-ignore
-  globalModule.setMemory(1, 16, 'memory');
+  mod.addMemoryExport("0", "memory");
 
   const declareGlobalVariable: TransformCallback<binaryen.Type> = (
     node,
@@ -188,19 +198,19 @@ export function generate(
     let rexpr = children[0]!;
 
     if (lt !== rt) {
-      const promotion = tryPromote(rt, lt, globalModule);
+      const promotion = tryPromote(rt, lt, mod);
 
       if (!!promotion) {
         rexpr = promotion(rexpr);
       } else {
         invariant(
           false,
-          'left-hand side type does not match right-hand side type'
+          "left-hand side type does not match right-hand side type"
         );
       }
     }
 
-    return globalModule.addGlobal(qualifiedName, t, isMutable, rexpr);
+    return mod.addGlobal(qualifiedName, t, isMutable, rexpr);
   };
 
   const declareLocalVariable: TransformCallback<binaryen.Type> = (
@@ -216,23 +226,23 @@ export function generate(
     let rExpr = children[0]!;
 
     if (lt !== rt) {
-      const promotion = tryPromote(rt, lt, globalModule);
+      const promotion = tryPromote(rt, lt, mod);
 
       if (!!promotion) {
         rExpr = promotion(rExpr);
       } else {
         invariant(
           false,
-          'left-hand side type does not match right-hand side type'
+          "left-hand side type does not match right-hand side type"
         );
       }
     }
 
-    return globalModule.local.set(localSymbol.localId!, rExpr);
+    return mod.local.set(localSymbol.localId!, rExpr);
   };
 
   const numberLiteral: TransformCallback<binaryen.Type> = (node, _chidlren) =>
-    globalModule[nativeType(node.staticType)!].const(node.value);
+    mod[nativeType(node.staticType)!].const(node.value);
 
   const traverseMap: TransformMap<binaryen.Type> = {
     [SyntaxType.FunctionDeclaration]: {
@@ -258,7 +268,7 @@ export function generate(
             .map((sym) => binaryenType(sym.staticType))
         );
 
-        return globalModule.addFunction(
+        return mod.addFunction(
           prefixModuleMember(procName),
           procParamType,
           procReturnType,
@@ -274,13 +284,13 @@ export function generate(
 
     [SyntaxType.Block]: {
       pre(node) {
-        invariant(currentScope != null, 'current scope is null');
+        invariant(currentScope != null, "current scope is null");
         currentScope = currentScope.blocks[currentScope.lastVisitedBlock++];
       },
       callback(node, children) {
         const stmts = filterNull(children);
         // @ts-ignore
-        return globalModule.block(null, stmts);
+        return mod.block(null, stmts);
       },
       post(node) {
         currentScope = exitScope(currentScope);
@@ -289,25 +299,26 @@ export function generate(
 
     [SyntaxType.LoopStatement]: {
       pre(_) {
-        loopLabelStack.push('loop/' + cuid());
+        loopLabelStack.push("loop/" + getNextBlockId());
       },
       callback(_, children) {
         const labelName = loopLabelStack[loopLabelStack.length - 1];
+        const [init, condition, block, afterthought] = children;
+        const breakLabel = labelName + "/break";
+        const continueLabel = labelName + "/continue";
 
         // 4th child is optional
         // @ts-ignore
-        return globalModule.block(null, [
-          children[0]!,
-          globalModule.loop(
+        return mod.block(breakLabel, [
+          init!,
+          mod.loop(
             labelName,
             // @ts-ignore
-            globalModule.block(labelName + '/continue', [
-              children[2]!,
-              globalModule.if(
-                children[1]!,
-                children[3] || globalModule.nop(),
-                globalModule.br(labelName)
-              ),
+            mod.block(continueLabel, [
+              mod.br_if(breakLabel, mod.i32.eq(condition!, mod.i32.const(0))),
+              block!,
+              afterthought || mod.nop(),
+              mod.br(labelName),
             ])
           ),
         ]);
@@ -318,18 +329,23 @@ export function generate(
     },
 
     [SyntaxType.BreakStatement]: (node, children) => {
-      invariant(loopLabelStack.length > 0, 'must be currently in a loop');
+      invariant(loopLabelStack.length > 0, "must be currently in a loop");
       const labelName = loopLabelStack[loopLabelStack.length - 1];
-      return globalModule.br(labelName);
+      return mod.br(labelName + "/break");
     },
 
     [SyntaxType.ContinueStatement]: (node, children) => {
-      invariant(loopLabelStack.length > 0, 'must be currently in a loop');
+      invariant(loopLabelStack.length > 0, "must be currently in a loop");
       const labelName = loopLabelStack[loopLabelStack.length - 1];
-      return globalModule.br(labelName + '/continue');
+      return mod.br(labelName + "/continue");
     },
 
     [SyntaxType.FunctionCall]: (node, children) => {
+      // TOOD(kosi): 1mil% hack to get independent study demo working
+      if (node.value === "store16") {
+        return mod.i32.store16(0, 0, children[0]!, children[1]!);
+      }
+
       // TODO(kosi): This will 100% break with access types
       const fn = lookupFunction(symtab, node.value)!;
       const retType = nativeType(fn.returnValue?.staticType!)!;
@@ -340,14 +356,14 @@ export function generate(
       );
       node.staticType = retType;
 
-      return globalModule.call(
+      return mod.call(
         prefixModuleMember(node.value),
         children.map((c) => c!),
         binaryenType(retType)
       );
     },
 
-    [SyntaxType.Noop]: (node, children) => globalModule.nop(),
+    [SyntaxType.Noop]: (node, children) => mod.nop(),
 
     [SyntaxType.GlobalImmutableDeclaration]: declareGlobalVariable,
 
@@ -367,20 +383,17 @@ export function generate(
       const exportType = symtab.exports[exportName];
 
       if (exportType === GlobalSymbolTablePortationType.Function) {
-        return globalModule.addFunctionExport(
+        return mod.addFunctionExport(
           prefixModuleMember(exportName),
           exportName
         );
       } else if (exportType === GlobalSymbolTablePortationType.Global) {
         invariant(
           symtab.symbols[exportName].immutable,
-          'exported global variables must be immutable'
+          "exported global variables must be immutable"
         );
 
-        return globalModule.addGlobalExport(
-          prefixModuleMember(exportName),
-          exportName
-        );
+        return mod.addGlobalExport(prefixModuleMember(exportName), exportName);
       }
     },
 
@@ -401,7 +414,7 @@ export function generate(
 
       const procReturnType = binaryenType(fnEntry.returnValue!.staticType);
 
-      return globalModule.addFunctionImport(
+      return mod.addFunctionImport(
         internalName,
         externalModule,
         moduleName,
@@ -417,15 +430,16 @@ export function generate(
         let operator = binopTable[node.value];
 
         const type =
-          node.value === '||' || node.value === '&&'
-            ? nativeType('bool')!
+          node.value === "||" || node.value === "&&"
+            ? nativeType("bool")!
             : nativeType(greaterType(l.staticType, rhs.staticType))!;
 
         // NOTE(kosi): Very big hack, but remove _s for floatingd types and add _u for unsigned types
-        if (type.indexOf('f') !== -1) {
-          operator = operator.replace('_s', '');
-        } else if (type.indexOf('u') !== -1) {
-          operator = operator.replace('_s', '_u');
+        if (type.indexOf("f") !== -1) {
+          operator = operator.replace("_s", "");
+          operator = operator.replace("_u", "");
+        } else if (type.indexOf("u") !== -1) {
+          operator = operator.replace("_s", "_u");
         }
 
         node.staticType = type;
@@ -434,11 +448,7 @@ export function generate(
         let rexpr = children[1]!;
 
         if (l.staticType !== rhs.staticType) {
-          const cast = typecastToGreaterType(
-            l.staticType,
-            rhs.staticType,
-            globalModule
-          );
+          const cast = typecastToGreaterType(l.staticType, rhs.staticType, mod);
 
           if (
             !!cast &&
@@ -450,11 +460,11 @@ export function generate(
           }
         }
 
-        let r = globalModule[type][operator](lexpr, rexpr);
+        let r = mod[type][operator](lexpr, rexpr);
 
         // NOTE(kosi): This means this is just an expression statement, we should drop this value
         if (node.parent?.type === SyntaxType.Block) {
-          return globalModule.drop(r);
+          return mod.drop(r);
         }
 
         return r;
@@ -464,11 +474,7 @@ export function generate(
     },
 
     [SyntaxType.TypecastExpression]: (node, children) => {
-      const cast = typecast(
-        node.params[0].staticType,
-        node.staticType,
-        globalModule
-      );
+      const cast = typecast(node.params[0].staticType, node.staticType, mod);
 
       return !!cast ? cast(children[0]!) : children[0]!;
     },
@@ -481,13 +487,11 @@ export function generate(
         const operator = unopTable[node.value];
         node.staticType = nativeType(l.staticType)!;
 
-        const r = globalModule[nativeType(l.staticType)!][operator](
-          ...children
-        );
+        const r = mod[nativeType(l.staticType)!][operator](...children);
 
         // NOTE(kosi): This means this is just an expression statement, we should drop this value
         if (node.parent?.type === SyntaxType.Block) {
-          return globalModule.drop(r);
+          return mod.drop(r);
         }
 
         return r;
@@ -501,7 +505,7 @@ export function generate(
       const [l, r] = node.params;
       const lhs = lookup(currentScope!, l.value);
 
-      invariant(!lhs?.immutable, 'cannot mutate immutable variables');
+      invariant(!lhs?.immutable, "cannot mutate immutable variables");
 
       // TODO(kosi): Abstract this out
       const lt = nativeType(l.staticType)!;
@@ -511,22 +515,22 @@ export function generate(
       let rExpr = children[1]!;
 
       if (lt !== rt) {
-        const promotion = tryPromote(rt, lt, globalModule);
+        const promotion = tryPromote(rt, lt, mod);
 
         if (!!promotion) {
           rExpr = promotion(rExpr);
         } else {
           invariant(
             false,
-            'left-hand side type does not match right-hand side type'
+            "left-hand side type does not match right-hand side type"
           );
         }
       }
 
       if (!!lhs?.localId) {
-        return globalModule.local.set(lhs.localId, rExpr);
+        return mod.local.set(lhs.localId, rExpr);
       } else {
-        return globalModule.global.set(prefixModuleMember(l.value), rExpr);
+        return mod.global.set(prefixModuleMember(l.value), rExpr);
       }
     },
 
@@ -542,7 +546,7 @@ export function generate(
         const promotion = tryPromote(
           node.params[0].staticType,
           currentRetValue!,
-          globalModule
+          mod
         );
 
         if (!!promotion) {
@@ -555,19 +559,14 @@ export function generate(
         }
       }
 
-      return globalModule.return(expr);
+      return mod.return(expr);
     },
 
     [SyntaxType.IfStatement]: (node, children) => {
-      return globalModule.if(
-        children[0]!,
-        children[1]!,
-        children[2] || undefined
-      );
+      return mod.if(children[0]!, children[1]!, children[2] || undefined);
     },
 
-    [SyntaxType.BoolLiteral]: (node, _) =>
-      globalModule.i32.const(node.value ? 1 : 0),
+    [SyntaxType.BoolLiteral]: (node, _) => mod.i32.const(node.value ? 1 : 0),
 
     [SyntaxType.Identifier]: (node, _) => {
       // If there is no current scope, then identifiers are being used outside of a function
@@ -586,11 +585,11 @@ export function generate(
       invariant(sym != null, `variable '${node.value}' does not exist`);
 
       return sym.global
-        ? globalModule.global.get(
+        ? mod.global.get(
             prefixModuleMember(node.value),
             binaryenType(sym.staticType)
           )
-        : globalModule.local.get(sym.localId!, binaryenType(sym.staticType));
+        : mod.local.get(sym.localId!, binaryenType(sym.staticType));
     },
   };
 
@@ -598,5 +597,5 @@ export function generate(
 
   // globalModule.optimize();
 
-  return globalModule;
+  return mod;
 }

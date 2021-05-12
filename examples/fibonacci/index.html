@@ -1,0 +1,12 @@
+<textarea id="output" style="height: 100%; width: 100%" readonly></textarea>
+<script>
+  WebAssembly.instantiateStreaming(fetch("fib.wasm"), {
+    /* imports */
+  }).then(({ instance }) => {
+    const { exports } = instance;
+    const output = document.getElementById("output");
+    for (let i = 0; i <= 10; ++i) {
+      output.value += `fibonacci(${i}) = ${exports.fibonacci(i)}\n`;
+    }
+  });
+</script>

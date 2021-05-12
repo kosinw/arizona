@@ -1,0 +1,1 @@
+azc mandel.az -O3 -o mandel.wasm -t mandel.wat --memoryImport

@@ -17,5 +17,8 @@ export interface CompileOptions {
   };
   binaryen?: {
     noValidate?: boolean;
+  },
+  memory?: {
+    import?: boolean;
   }
 }
