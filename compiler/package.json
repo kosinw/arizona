@@ -26,7 +26,6 @@
     "@types/moo": "^0.5.4",
     "@types/nearley": "^2.11.1",
     "jest": "^26.6.3",
-    "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
     "ts-jest": "^26.5.5",
     "ts-node": "^9.1.1",

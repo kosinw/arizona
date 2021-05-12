@@ -48,3 +48,11 @@ ast_view
 
 dist/
 tsconfig.tsbuildinfo
+
+# Yarn stuff
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
