@@ -12,9 +12,9 @@ const NUM_COLORS: i32 = 2048;
 export fn update(width: i32, height: i32, limit: i32) {
   let translateX: f64 = width  * (1.0 / 1.6);
   let translateY: f64 = height * (1.0 / 2.0);
-  let scale: f64      = 10.0 / min(3 * width, 4 * height);
+  let scale: f64 = 10.0 / min(3 * width, 4 * height);
   let realOffset: f64 = translateX * scale;
-  let invLimit: f64   = 1.0 / limit;
+  let invLimit: f64 = 1.0 / limit;
 
   let minIterations: i32 = min(8, limit);
 
@@ -23,7 +23,7 @@ export fn update(width: i32, height: i32, limit: i32) {
     let yOffset: i32   = (y * width) << 1;
 
     for (let x: i32 = 0; x < width; x += 1) {
-      let real: i32 = x * scale - realOffset;
+      let real: f64 = x * scale - realOffset;
 
       // Iterate until either the escape radius or iteration limit is exceeded
       let ix: f64 = 0.0;
