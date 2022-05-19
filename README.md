@@ -21,29 +21,3 @@ Arizona borrows syntactical similarities from Rust and is designed to be as flex
 
 ## What is Arizona?
 Arizona was started as a fun aside and independent research project by [Kosi Nwabueze](https://kosinw.com) in his senior year of high-school. The original goal of Arizona was to serve as a capstone project representing Kosi's research into compiler development and programming language design.
-
-
-# Table of Contents
-* [What is Arizona?](#what-is-arizona)
-* [Grammar and Syntax](#grammar-and-syntax)
-    * [Lexical elements](#lexing)
-    * [Expressions](#expressions)
-    * [Statements](#statements)
-    * [Top-level declarations](#top-level-declarations)
-* [Types and Semantics](#types)
-* [Exports and Imports](#exports-and-imports)
-* [Installation](#installation)
-* [Compiler Usage](#compiler-usage)
-* [License](#license)
-
-# Grammar and Syntax
-## Lexical elements
-## Expressions
-## Statements
-## Top-level declarations
-# Types and Semantics
-# Exports and Imports
-# Installation
-# Compiler Usage
-# License
-[MIT](./LICENSE)
